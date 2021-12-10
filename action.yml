@@ -1,0 +1,28 @@
+name: 'AWS CloudFormation'
+description: 'Create a CloudFormation Stack from a template.'
+author: 'Richard Willis <willis.rh@gmail.com>'
+branding:
+  icon: 'upload-cloud'
+  color: 'gray-dark'
+inputs:
+  stack-name:
+    required: true
+    description: 'The name of the Cloudformation stack to be created. For example: "example-com-static-cloudformation-stack"'
+  template:
+    required: true
+    description: 'The relative path to the CloudFormation stack template. For example: "./cloudformation/s3bucket_with_cloudfront.yml"'
+  github-token:
+    required: true
+    description: 'GitHub Token used for commenting on Pull Requests. Use the default ${{ secrets.GITHUB_TOKEN }}'
+  aws-region:
+    require: true
+    description: 'The AWS region in which to create the stack. For example: "us-east-1"'
+  parameters:
+    description: 'The parameters to override in the stack inputs as a query string. For example: "Param1=foo&Param2=http://example.com"'
+    required: false
+  preview:
+    required: false
+    description: 'Whether to show the ChangeSet as a Pull Request comment'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

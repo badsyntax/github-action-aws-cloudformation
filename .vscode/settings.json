@@ -1,0 +1,39 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "dist/**": true,
+    "lib/**": true,
+    "package-lock.json": true
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "eslint.validate": ["javascript", "typescript"],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": false
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "cSpell.language": "en-GB",
+  "cSpell.words": [
+    "badsyntax",
+    "Behavior",
+    "color",
+    "globber",
+    "maxage",
+    "richardwillis",
+    "vars"
+  ],
+  "jest.autoRun": "off"
+}
