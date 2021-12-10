@@ -1,6 +1,6 @@
 # AWS CloudFormation GitHub Action
 
-[![Build & Deploy](https://github.com/badsyntax/github-action-aws-static-stack/actions/workflows/deploy.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-static-stack/actions/workflows/build-deploy.yml)
+[![Deploy Stack](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml)
 
 A GitHub Action to create/update your CloudFormation stack.
 
