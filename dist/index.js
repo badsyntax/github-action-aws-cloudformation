@@ -36182,7 +36182,7 @@ var _version = _interopRequireDefault(__nccwpck_require__(2414));
 
 var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
 
 var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
@@ -36357,7 +36357,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 8950:
+/***/ 2981:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
@@ -36414,7 +36414,7 @@ exports["default"] = void 0;
 
 var _rng = _interopRequireDefault(__nccwpck_require__(807));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36548,7 +36548,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports["default"] = _default;
 exports.URL = exports.DNS = void 0;
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
 
 var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
@@ -36633,7 +36633,7 @@ exports["default"] = void 0;
 
 var _rng = _interopRequireDefault(__nccwpck_require__(807));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37054,7 +37054,7 @@ var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/client-cloudformation/dist-cjs/index.js
 var dist_cjs = __nccwpck_require__(5650);
 ;// CONCATENATED MODULE: ./lib/constants.js
-const defaultDelayMs = 3000;
+const defaultDelayMs = 5000;
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
@@ -37452,17 +37452,14 @@ function getChangeSetTable(changes, preview) {
     if (!changes.length) {
         return '';
     }
-    const headings = [
-        ['', 'ResourceType', 'LogicalResourceId', 'Action', 'Replacement'],
-    ];
+    const headings = [['', 'ResourceType', 'LogicalResourceId', 'Action']];
     const rows = changes.map((change) => {
-        var _a, _b, _c, _d;
+        var _a, _b, _c;
         return [
             preview ? '⚠️' : '✅',
             String((_a = change.ResourceChange) === null || _a === void 0 ? void 0 : _a.ResourceType),
             String((_b = change.ResourceChange) === null || _b === void 0 ? void 0 : _b.LogicalResourceId),
             String((_c = change.ResourceChange) === null || _c === void 0 ? void 0 : _c.Action),
-            String((_d = change.ResourceChange) === null || _d === void 0 ? void 0 : _d.Replacement),
         ];
     });
     return markdownTable(headings.concat(rows), {
@@ -37482,10 +37479,10 @@ function getCommentMarkdown(changes, changeSetTable) {
 function generateCommentId(issue) {
     return `AWS CloudFormation ChangeSet (ID:${issue.number})`;
 }
-async function deletePRComment(token) {
+async function maybeDeletePRComment(gitHubToken) {
     const issue = github.context.issue;
     const commentId = generateCommentId(issue);
-    const octokit = github.getOctokit(token);
+    const octokit = github.getOctokit(gitHubToken);
     const comments = await octokit.rest.issues.listComments({
         issue_number: issue.number,
         owner: issue.owner,
@@ -37501,13 +37498,14 @@ async function deletePRComment(token) {
         });
     }
 }
-async function addPRCommentWithChangeSet(changes, token, preview) {
+async function addPRCommentWithChangeSet(changes, gitHubToken, preview) {
+    await maybeDeletePRComment(gitHubToken);
     const changeSetTable = getChangeSetTable(changes, preview);
     const markdown = getCommentMarkdown(changes, changeSetTable);
     const issue = github.context.issue;
     const commentId = generateCommentId(issue);
     const body = `${commentId}\n${markdown}`;
-    const octokit = github.getOctokit(token);
+    const octokit = github.getOctokit(gitHubToken);
     await octokit.rest.issues.createComment({
         issue_number: issue.number,
         body: body,
@@ -37541,44 +37539,18 @@ function delay(delayMs) {
 
 
 
-const logs = {
-    stackStatusLogs: {},
-    changeSetStatusLogs: {},
-};
+let rollbackDetected = false;
 function logStackStatus(status) {
-    if (!(status in logs.stackStatusLogs)) {
-        logs.stackStatusLogs[status] = true;
-        if (status === String(dist_cjs.StackStatus.ROLLBACK_IN_PROGRESS)) {
-            (0,core.warning)(`${dist_cjs.StackStatus.ROLLBACK_IN_PROGRESS} detected! **Check the CloudFormation events in the AWS Console for more information.** ` +
-                `${dist_cjs.StackStatus.ROLLBACK_IN_PROGRESS} can take a while to complete. ` +
-                `You can manually delete the CloudFormation stack in the AWS Console or just wait until this process completes...`);
-        }
-        (0,core.info)(`Stack Status: ${status}`);
+    if (status === dist_cjs.StackStatus.ROLLBACK_IN_PROGRESS && !rollbackDetected) {
+        rollbackDetected = true;
+        (0,core.warning)(`${dist_cjs.StackStatus.ROLLBACK_IN_PROGRESS} detected! **Check the CloudFormation events in the AWS Console for more information.** ` +
+            `${dist_cjs.StackStatus.ROLLBACK_IN_PROGRESS} can take a while to complete. ` +
+            `You can manually delete the CloudFormation stack in the AWS Console or just wait until this process completes...`);
     }
-}
-function resetStatusLogs() {
-    logs.stackStatusLogs = {};
+    (0,core.info)(`StackStatus: ${status}`);
 }
 function logChangeSetStatus(status) {
-    if (!(status in logs.changeSetStatusLogs)) {
-        logs.changeSetStatusLogs[status] = true;
-        (0,core.info)(`ChangeSet: ${status}`);
-    }
-}
-function resetChangeSetStatusLogs() {
-    logs.changeSetStatusLogs = {};
-}
-function getCloudFormationParameters(parametersQuery) {
-    var _a;
-    const params = new URLSearchParams(parametersQuery);
-    const cfParams = [];
-    for (const key of params.keys()) {
-        cfParams.push({
-            ParameterKey: key.trim(),
-            ParameterValue: ((_a = params.get(key)) === null || _a === void 0 ? void 0 : _a.trim()) || undefined,
-        });
-    }
-    return cfParams;
+    (0,core.info)(`ChangeSet: ${status}`);
 }
 async function getAllStacks(client, nextToken, allStacks = []) {
     const response = await client.send(new dist_cjs.ListStacksCommand({
@@ -37601,40 +37573,17 @@ async function hasCreatedStack(client, cfStackName) {
     const stack = await getExistingStack(client, cfStackName);
     return stack !== undefined;
 }
-async function updateExistingStack(client, cfStackName, cfTemplateBody) {
-    return client.send(new UpdateStackCommand({
-        StackName: cfStackName,
-        TemplateBody: cfTemplateBody,
-    }));
-}
-async function createNewStack(client, cfStackName, cfTemplateBody, parameters) {
-    await client.send(new CreateStackCommand({
-        StackName: cfStackName,
-        TemplateBody: cfTemplateBody,
-        Parameters: parameters,
-        Capabilities: [Capability.CAPABILITY_IAM],
-    }));
-    const status = await waitForCompleteOrFailed(client, cfStackName);
-    if (status !== String(StackStatus.CREATE_COMPLETE)) {
-        throw new Error('Stack creation failed');
-    }
-    notice(`Stack ${cfStackName} successfully created`);
-}
 async function waitForStackStatus(client, cfStackName, status, delayMs = defaultDelayMs) {
     try {
         const stack = await describeStack(client, cfStackName);
-        const stackStatus = String(stack.StackStatus);
-        logStackStatus(stackStatus);
-        if (stackStatus !== status) {
+        logStackStatus(stack.StackStatus);
+        if (stack.StackStatus !== status) {
             await delay(delayMs);
             await waitForStackStatus(client, cfStackName, status, delayMs);
         }
     }
     catch (e) {
         (0,core.debug)(`Unable to wait for status ${status} because ${e.message}`);
-    }
-    finally {
-        resetStatusLogs();
     }
 }
 async function applyChangeSet(client, cfStackName, changeSetId) {
@@ -37655,48 +37604,45 @@ async function describeStack(client, cfStackName) {
     return response.Stacks[0];
 }
 async function waitForCompleteOrFailed(client, cfStackName, delayMs = defaultDelayMs, completeOrFailedStatuses = [
-    String(dist_cjs.StackStatus.CREATE_COMPLETE),
-    String(dist_cjs.StackStatus.CREATE_FAILED),
-    String(dist_cjs.StackStatus.DELETE_COMPLETE),
-    String(dist_cjs.StackStatus.DELETE_FAILED),
-    String(dist_cjs.StackStatus.IMPORT_COMPLETE),
-    String(dist_cjs.StackStatus.IMPORT_ROLLBACK_COMPLETE),
-    String(dist_cjs.StackStatus.IMPORT_ROLLBACK_FAILED),
-    String(dist_cjs.StackStatus.ROLLBACK_COMPLETE),
-    String(dist_cjs.StackStatus.ROLLBACK_FAILED),
-    String(dist_cjs.StackStatus.UPDATE_COMPLETE),
-    String(dist_cjs.StackStatus.UPDATE_FAILED),
-    String(dist_cjs.StackStatus.UPDATE_ROLLBACK_COMPLETE),
-    String(dist_cjs.StackStatus.UPDATE_ROLLBACK_FAILED),
+    dist_cjs.StackStatus.CREATE_COMPLETE,
+    dist_cjs.StackStatus.CREATE_FAILED,
+    dist_cjs.StackStatus.DELETE_COMPLETE,
+    dist_cjs.StackStatus.DELETE_FAILED,
+    dist_cjs.StackStatus.IMPORT_COMPLETE,
+    dist_cjs.StackStatus.IMPORT_ROLLBACK_COMPLETE,
+    dist_cjs.StackStatus.IMPORT_ROLLBACK_FAILED,
+    dist_cjs.StackStatus.ROLLBACK_COMPLETE,
+    dist_cjs.StackStatus.ROLLBACK_FAILED,
+    dist_cjs.StackStatus.UPDATE_COMPLETE,
+    dist_cjs.StackStatus.UPDATE_FAILED,
+    dist_cjs.StackStatus.UPDATE_ROLLBACK_COMPLETE,
+    dist_cjs.StackStatus.UPDATE_ROLLBACK_FAILED,
 ]) {
     try {
         const stack = await describeStack(client, cfStackName);
-        const status = String(stack.StackStatus);
-        logStackStatus(status);
-        if (!completeOrFailedStatuses.includes(status)) {
+        logStackStatus(stack.StackStatus);
+        if (!completeOrFailedStatuses.includes(stack.StackStatus)) {
             await delay(delayMs);
             return await waitForCompleteOrFailed(client, cfStackName, delayMs);
         }
-        return status;
+        return stack.StackStatus;
     }
     catch (e) {
         throw e;
-    }
-    finally {
-        resetStatusLogs();
     }
 }
 async function deleteExistingStack(client, cfStackName) {
     await client.send(new dist_cjs.DeleteStackCommand({
         StackName: cfStackName,
     }));
-    await waitForStackStatus(client, cfStackName, String(dist_cjs.StackStatus.DELETE_COMPLETE));
+    await waitForStackStatus(client, cfStackName, dist_cjs.StackStatus.DELETE_COMPLETE);
     (0,core.notice)(`Stack ${cfStackName} successfully deleted`);
 }
 function shouldDeleteExistingStack(stack) {
-    // If the StackStatus is ROLLBACK_COMPLETE then we cannot update it
-    // and instead need to delete it and re-create it.
-    return stack.StackStatus === dist_cjs.StackStatus.ROLLBACK_COMPLETE;
+    // If the StackStatus is ROLLBACK_COMPLETE then we cannot update it.
+    // If the StackStatus is REVIEW_IN_PROGRESS then we can't update it.
+    return (stack.StackStatus === dist_cjs.StackStatus.ROLLBACK_COMPLETE ||
+        stack.StackStatus === dist_cjs.StackStatus.REVIEW_IN_PROGRESS);
 }
 async function createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, parameters) {
     return client.send(new dist_cjs.CreateChangeSetCommand({
@@ -37727,12 +37673,11 @@ async function describeChangeSet(client, cfStackName, changeSetId, nextToken, de
     if (response.NextToken) {
         return await describeChangeSet(client, cfStackName, changeSetId, response.NextToken);
     }
-    logChangeSetStatus(String(response.Status));
+    logChangeSetStatus(response.Status);
     if (response.Status !== dist_cjs.ChangeSetStatus.CREATE_COMPLETE) {
         await delay(delayMs);
         return await describeChangeSet(client, cfStackName, changeSetId, response.NextToken);
     }
-    resetChangeSetStatusLogs();
     return response.Changes || [];
 }
 async function getChanges(client, cfStackName, changeSet) {
@@ -37749,11 +37694,14 @@ async function getChangeSetType(client, cfStackName, parameters) {
         .map((p) => `${p.ParameterKey}: ${p.ParameterValue}`)
         .join(', ')}`);
     let update = false;
+    // When a ChangeSet is created for a stack that does not exist, a stack will be
+    // created with status REVIEW_IN_PROGRESS, and we can't generate a new
+    // ChangeSet against this stack, which is why we have to delete it first.
     if (hasExistingStack) {
         const stack = await describeStack(client, cfStackName);
-        const shouldDelete = await shouldDeleteExistingStack(stack);
+        const shouldDelete = shouldDeleteExistingStack(stack);
         if (shouldDelete) {
-            (0,core.warning)(`Deleting existing stack ${cfStackName}, due to ${dist_cjs.StackStatus.ROLLBACK_COMPLETE} status`);
+            (0,core.warning)(`Deleting existing stack ${cfStackName}, due to ${stack.StackStatus} status`);
             await deleteExistingStack(client, cfStackName);
         }
         else {
@@ -37762,25 +37710,47 @@ async function getChangeSetType(client, cfStackName, parameters) {
     }
     return update ? dist_cjs.ChangeSetType.UPDATE : dist_cjs.ChangeSetType.CREATE;
 }
-async function updateCloudFormationStack(cloudFormationClient, cfStackName, githubToken, preview, cfTemplateBody, cfParameters) {
-    const changeSetType = await getChangeSetType(cloudFormationClient, cfStackName, cfParameters);
-    const changeSet = await createChangeSet(cloudFormationClient, cfStackName, changeSetType, cfTemplateBody, cfParameters);
-    const changes = await getChanges(cloudFormationClient, cfStackName, changeSet);
+async function validateTemplate(client, templateBody) {
+    await client.send(new dist_cjs.ValidateTemplateCommand({
+        TemplateBody: templateBody,
+    }));
+}
+function getCloudFormationParameters(parametersQuery) {
+    var _a;
+    const params = new URLSearchParams(parametersQuery);
+    const cfParams = [];
+    for (const key of params.keys()) {
+        cfParams.push({
+            ParameterKey: key.trim(),
+            ParameterValue: ((_a = params.get(key)) === null || _a === void 0 ? void 0 : _a.trim()) || undefined,
+        });
+    }
+    return cfParams;
+}
+async function updateCloudFormationStack(client, cfStackName, gitHubToken, preview, cfTemplateBody, cfParameters) {
+    await validateTemplate(client, cfTemplateBody);
+    const changeSetType = await getChangeSetType(client, cfStackName, cfParameters);
+    const changeSet = await createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, cfParameters);
+    const changes = await getChanges(client, cfStackName, changeSet);
     if (changeSet.Id) {
         if (changes.length) {
             if (!preview) {
                 (0,core.info)(`Applying ChangeSet, this can take a while...`);
-                await applyChangeSet(cloudFormationClient, cfStackName, changeSet.Id);
+                await applyChangeSet(client, cfStackName, changeSet.Id);
                 (0,core.notice)(`Successfully applied Stack ChangeSet`);
             }
         }
         else {
             (0,core.info)('(No Stack changes)');
-            await deleteChangeSet(cloudFormationClient, cfStackName, changeSet.Id);
+            await deleteChangeSet(client, cfStackName, changeSet.Id);
             (0,core.info)('Successfully deleted ChangeSet');
         }
-        await deletePRComment(githubToken);
-        await addPRCommentWithChangeSet(changes, githubToken, preview);
+        if (rollbackDetected) {
+            throw new Error('Rollback detected, stack creation failed');
+        }
+        else {
+            await addPRCommentWithChangeSet(changes, gitHubToken, preview);
+        }
     }
     return changes;
 }
@@ -37788,11 +37758,11 @@ async function updateCloudFormationStack(cloudFormationClient, cfStackName, gith
 ;// CONCATENATED MODULE: ./lib/inputs.js
 
 function getInputs() {
-    const stackName = (0,core.getInput)('stack-name', {
+    const stackName = (0,core.getInput)('stackName', {
         required: true,
         trimWhitespace: true,
     });
-    const region = (0,core.getInput)('aws-region', {
+    const region = (0,core.getInput)('awsRegion', {
         required: true,
         trimWhitespace: true,
     });
@@ -37800,7 +37770,7 @@ function getInputs() {
         required: true,
         trimWhitespace: true,
     });
-    const token = (0,core.getInput)('token', {
+    const gitHubToken = (0,core.getInput)('gitHubToken', {
         required: true,
         trimWhitespace: true,
     });
@@ -37816,16 +37786,13 @@ function getInputs() {
         stackName,
         region,
         template,
-        token,
+        gitHubToken,
         preview,
         parameters,
     };
 }
 
-;// CONCATENATED MODULE: external "node:console"
-const external_node_console_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:console");
 ;// CONCATENATED MODULE: ./lib/main.js
-
 
 
 
@@ -37837,6 +37804,7 @@ async function run() {
     try {
         checkIsValidGitHubEvent();
         const inputs = getInputs();
+        (0,core.debug)(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
         const cfTemplateBody = external_node_fs_namespaceObject.readFileSync(external_node_path_namespaceObject.resolve(inputs.template), 'utf8');
         const cloudFormationClient = new dist_cjs.CloudFormationClient({
             region: inputs.region,
@@ -37854,8 +37822,8 @@ async function run() {
         }
         else {
             const cfParameters = getCloudFormationParameters(inputs.parameters);
-            (0,external_node_console_namespaceObject.debug)(`Parsed params: ${JSON.stringify(cfParameters, null, 2)}`);
-            await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.token, inputs.preview, cfTemplateBody, cfParameters);
+            (0,core.debug)(`CloudFormation template params:\n${JSON.stringify(cfParameters, null, 2)}`);
+            await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.preview, cfTemplateBody, cfParameters);
         }
     }
     catch (error) {

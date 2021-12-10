@@ -1,12 +1,12 @@
 import { getInput } from '@actions/core';
 
 export function getInputs() {
-  const stackName = getInput('stack-name', {
+  const stackName = getInput('stackName', {
     required: true,
     trimWhitespace: true,
   });
 
-  const region = getInput('aws-region', {
+  const region = getInput('awsRegion', {
     required: true,
     trimWhitespace: true,
   });
@@ -16,7 +16,7 @@ export function getInputs() {
     trimWhitespace: true,
   });
 
-  const token = getInput('token', {
+  const gitHubToken = getInput('gitHubToken', {
     required: true,
     trimWhitespace: true,
   });
@@ -36,7 +36,7 @@ export function getInputs() {
     stackName,
     region,
     template,
-    token,
+    gitHubToken,
     preview,
     parameters,
   };

@@ -31,16 +31,16 @@ Resources:
   S3BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Metadata:
-      Comment: 'Bucket policy to allow CloudFront & Public access'
+      Comment: 'Grant read-only permissions to anonymous users'
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
         Statement:
           - Action:
-              - 's3:*'
+              - 's3:GetObject'
+              - 's3:GetObjectVersion'
             Effect: 'Allow'
-            Principal:
-              CanonicalUser: !GetAtt CFOriginAccessIdentity.S3CanonicalUserId
+            Principal: '*'
             Resource:
               - !Sub 'arn:aws:s3:::${S3BucketName}/*'
 

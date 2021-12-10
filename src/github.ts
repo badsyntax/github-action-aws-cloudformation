@@ -13,18 +13,13 @@ function getChangeSetTable(changes: Change[], preview: boolean): string {
   if (!changes.length) {
     return '';
   }
-  const headings = [
-    ['', 'ResourceType', 'LogicalResourceId', 'Action', 'Replacement'],
-  ];
-  const rows: [string, string, string, string, string][] = changes.map(
-    (change) => [
-      preview ? '⚠️' : '✅',
-      String(change.ResourceChange?.ResourceType),
-      String(change.ResourceChange?.LogicalResourceId),
-      String(change.ResourceChange?.Action),
-      String(change.ResourceChange?.Replacement),
-    ]
-  );
+  const headings = [['', 'ResourceType', 'LogicalResourceId', 'Action']];
+  const rows = changes.map((change) => [
+    preview ? '⚠️' : '✅',
+    String(change.ResourceChange?.ResourceType),
+    String(change.ResourceChange?.LogicalResourceId),
+    String(change.ResourceChange?.Action),
+  ]);
   return markdownTable(headings.concat(rows), {
     align: headings.map(() => 'l'),
   });
@@ -49,10 +44,10 @@ export function generateCommentId(issue: typeof github.context.issue): string {
   return `AWS CloudFormation ChangeSet (ID:${issue.number})`;
 }
 
-export async function deletePRComment(token: string): Promise<void> {
+export async function maybeDeletePRComment(gitHubToken: string): Promise<void> {
   const issue = github.context.issue;
   const commentId = generateCommentId(issue);
-  const octokit = github.getOctokit(token);
+  const octokit = github.getOctokit(gitHubToken);
 
   const comments = await octokit.rest.issues.listComments({
     issue_number: issue.number,
@@ -76,16 +71,18 @@ export async function deletePRComment(token: string): Promise<void> {
 
 export async function addPRCommentWithChangeSet(
   changes: Change[],
-  token: string,
+  gitHubToken: string,
   preview: boolean
 ): Promise<void> {
+  await maybeDeletePRComment(gitHubToken);
+
   const changeSetTable = getChangeSetTable(changes, preview);
   const markdown = getCommentMarkdown(changes, changeSetTable);
 
   const issue = github.context.issue;
   const commentId = generateCommentId(issue);
   const body = `${commentId}\n${markdown}`;
-  const octokit = github.getOctokit(token);
+  const octokit = github.getOctokit(gitHubToken);
 
   await octokit.rest.issues.createComment({
     issue_number: issue.number,
