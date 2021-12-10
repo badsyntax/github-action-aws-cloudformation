@@ -1,4 +1,4 @@
-name: 'Build & Deploy'
+name: 'Deploy Stack'
 
 concurrency:
   group: prod_deploy
@@ -15,14 +15,10 @@ on:
 
 jobs:
   deploy:
-    name: 'Build & Deploy'
-    runs-on: ubuntu-latest
+    name: 'Deploy'
+    runs-on: ubuntu-20.04
     if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v2
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -38,9 +34,9 @@ jobs:
       - uses: ./
         name: Deploy Stack
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          stack-name: 'richardwillis-github-action-example-cloudformation-stack'
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          stackName: 'richardwillis-github-action-example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
-          preview: true
-          aws-region: 'us-east-1'
+          preview: false
+          awsRegion: 'us-east-1'
           parameters: 'S3BucketName=richardwillis.info-example-bucket-us-east-1&S3AllowedOrigins=https://richardwillis.info'

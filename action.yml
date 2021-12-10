@@ -5,16 +5,16 @@ branding:
   icon: 'upload-cloud'
   color: 'gray-dark'
 inputs:
-  stack-name:
+  stackName:
     required: true
     description: 'The name of the Cloudformation stack to be created. For example: "example-com-static-cloudformation-stack"'
   template:
     required: true
     description: 'The relative path to the CloudFormation stack template. For example: "./cloudformation/s3bucket_with_cloudfront.yml"'
-  github-token:
+  gitHubToken:
     required: true
-    description: 'GitHub Token used for commenting on Pull Requests. Use the default ${{ secrets.GITHUB_TOKEN }}'
-  aws-region:
+    description: 'GitHub Token used for commenting on Pull Requests. Use the default GITHUB_TOKEN from secrets.'
+  awsRegion:
     require: true
     description: 'The AWS region in which to create the stack. For example: "us-east-1"'
   parameters:

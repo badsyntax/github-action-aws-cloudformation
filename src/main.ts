@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { setFailed } from '@actions/core';
+import { debug, setFailed } from '@actions/core';
 import { CloudFormationClient } from '@aws-sdk/client-cloudformation';
 
 import {
@@ -9,13 +9,14 @@ import {
 } from './cloudformation.js';
 import { checkIsValidGitHubEvent, isPullRequestClosed } from './github.js';
 import { getInputs } from './inputs.js';
-import { debug } from 'node:console';
 
 export async function run(): Promise<void> {
   try {
     checkIsValidGitHubEvent();
 
     const inputs = getInputs();
+
+    debug(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
 
     const cfTemplateBody = fs.readFileSync(
       path.resolve(inputs.template),
@@ -39,12 +40,18 @@ export async function run(): Promise<void> {
     } else {
       const cfParameters = getCloudFormationParameters(inputs.parameters);
 
-      debug(`Parsed params: ${JSON.stringify(cfParameters, null, 2)}`);
+      debug(
+        `CloudFormation template params:\n${JSON.stringify(
+          cfParameters,
+          null,
+          2
+        )}`
+      );
 
       await updateCloudFormationStack(
         cloudFormationClient,
         inputs.stackName,
-        inputs.token,
+        inputs.gitHubToken,
         inputs.preview,
         cfTemplateBody,
         cfParameters

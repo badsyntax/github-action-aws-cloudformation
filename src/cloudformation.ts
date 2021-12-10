@@ -5,9 +5,6 @@ import {
   StackSummary,
   ListStacksCommand,
   StackStatus,
-  UpdateStackCommandOutput,
-  UpdateStackCommand,
-  CreateStackCommand,
   Capability,
   DescribeStacksCommand,
   DeleteStackCommand,
@@ -21,69 +18,32 @@ import {
   DeleteChangeSetCommand,
   DeleteChangeSetCommandOutput,
   ExecuteChangeSetCommand,
+  ValidateTemplateCommand,
 } from '@aws-sdk/client-cloudformation';
 
 import { defaultDelayMs } from './constants.js';
-import { addPRCommentWithChangeSet, deletePRComment } from './github.js';
+import { addPRCommentWithChangeSet } from './github.js';
 import { delay } from './util.js';
 
-export type CFDistributionId = 'CFDistributionPreviewId' | 'CFDistributionId';
+let rollbackDetected = false;
 
-type logMap = {
-  [key: string]: boolean;
-};
-
-const logs: {
-  [key: string]: logMap;
-} = {
-  stackStatusLogs: {},
-  changeSetStatusLogs: {},
-};
-
-function logStackStatus(status: string): void {
-  if (!(status in logs.stackStatusLogs)) {
-    logs.stackStatusLogs[status] = true;
-    if (status === String(StackStatus.ROLLBACK_IN_PROGRESS)) {
-      warning(
-        `${StackStatus.ROLLBACK_IN_PROGRESS} detected! **Check the CloudFormation events in the AWS Console for more information.** ` +
-          `${StackStatus.ROLLBACK_IN_PROGRESS} can take a while to complete. ` +
-          `You can manually delete the CloudFormation stack in the AWS Console or just wait until this process completes...`
-      );
-    }
-    info(`Stack Status: ${status}`);
+function logStackStatus(status: StackStatus): void {
+  if (status === StackStatus.ROLLBACK_IN_PROGRESS && !rollbackDetected) {
+    rollbackDetected = true;
+    warning(
+      `${StackStatus.ROLLBACK_IN_PROGRESS} detected! **Check the CloudFormation events in the AWS Console for more information.** ` +
+        `${StackStatus.ROLLBACK_IN_PROGRESS} can take a while to complete. ` +
+        `You can manually delete the CloudFormation stack in the AWS Console or just wait until this process completes...`
+    );
   }
+  info(`StackStatus: ${status}`);
 }
 
-function resetStatusLogs(): void {
-  logs.stackStatusLogs = {};
+function logChangeSetStatus(status: ChangeSetStatus): void {
+  info(`ChangeSet: ${status}`);
 }
 
-function logChangeSetStatus(status: string): void {
-  if (!(status in logs.changeSetStatusLogs)) {
-    logs.changeSetStatusLogs[status] = true;
-    info(`ChangeSet: ${status}`);
-  }
-}
-
-function resetChangeSetStatusLogs(): void {
-  logs.changeSetStatusLogs = {};
-}
-
-export function getCloudFormationParameters(
-  parametersQuery: string
-): Parameter[] {
-  const params = new URLSearchParams(parametersQuery);
-  const cfParams: Parameter[] = [];
-  for (const key of params.keys()) {
-    cfParams.push({
-      ParameterKey: key.trim(),
-      ParameterValue: params.get(key)?.trim() || undefined,
-    });
-  }
-  return cfParams;
-}
-
-export async function getAllStacks(
+async function getAllStacks(
   client: CloudFormationClient,
   nextToken?: string,
   allStacks: StackSummary[] = []
@@ -101,7 +61,7 @@ export async function getAllStacks(
   return stacks;
 }
 
-export async function getExistingStack(
+async function getExistingStack(
   client: CloudFormationClient,
   cfStackName: string
 ): Promise<StackSummary | void> {
@@ -114,7 +74,7 @@ export async function getExistingStack(
   );
 }
 
-export async function hasCreatedStack(
+async function hasCreatedStack(
   client: CloudFormationClient,
   cfStackName: string
 ): Promise<boolean> {
@@ -122,51 +82,16 @@ export async function hasCreatedStack(
   return stack !== undefined;
 }
 
-export async function updateExistingStack(
+async function waitForStackStatus(
   client: CloudFormationClient,
   cfStackName: string,
-  cfTemplateBody: string
-): Promise<UpdateStackCommandOutput> {
-  return client.send(
-    new UpdateStackCommand({
-      StackName: cfStackName,
-      TemplateBody: cfTemplateBody,
-    })
-  );
-}
-
-export async function createNewStack(
-  client: CloudFormationClient,
-  cfStackName: string,
-  cfTemplateBody: string,
-  parameters: Parameter[]
-): Promise<void> {
-  await client.send(
-    new CreateStackCommand({
-      StackName: cfStackName,
-      TemplateBody: cfTemplateBody,
-      Parameters: parameters,
-      Capabilities: [Capability.CAPABILITY_IAM],
-    })
-  );
-  const status = await waitForCompleteOrFailed(client, cfStackName);
-  if (status !== String(StackStatus.CREATE_COMPLETE)) {
-    throw new Error('Stack creation failed');
-  }
-  notice(`Stack ${cfStackName} successfully created`);
-}
-
-export async function waitForStackStatus(
-  client: CloudFormationClient,
-  cfStackName: string,
-  status: string,
+  status: StackStatus,
   delayMs = defaultDelayMs
 ): Promise<void> {
   try {
     const stack = await describeStack(client, cfStackName);
-    const stackStatus = String(stack.StackStatus);
-    logStackStatus(stackStatus);
-    if (stackStatus !== status) {
+    logStackStatus(stack.StackStatus as StackStatus);
+    if (stack.StackStatus !== status) {
       await delay(delayMs);
       await waitForStackStatus(client, cfStackName, status, delayMs);
     }
@@ -174,12 +99,10 @@ export async function waitForStackStatus(
     debug(
       `Unable to wait for status ${status} because ${(e as Error).message}`
     );
-  } finally {
-    resetStatusLogs();
   }
 }
 
-export async function applyChangeSet(
+async function applyChangeSet(
   client: CloudFormationClient,
   cfStackName: string,
   changeSetId: string
@@ -193,7 +116,7 @@ export async function applyChangeSet(
   await waitForCompleteOrFailed(client, cfStackName);
 }
 
-export async function describeStack(
+async function describeStack(
   client: CloudFormationClient,
   cfStackName: string
 ): Promise<Stack> {
@@ -208,43 +131,40 @@ export async function describeStack(
   return response.Stacks[0];
 }
 
-export async function waitForCompleteOrFailed(
+async function waitForCompleteOrFailed(
   client: CloudFormationClient,
   cfStackName: string,
   delayMs = defaultDelayMs,
   completeOrFailedStatuses = [
-    String(StackStatus.CREATE_COMPLETE),
-    String(StackStatus.CREATE_FAILED),
-    String(StackStatus.DELETE_COMPLETE),
-    String(StackStatus.DELETE_FAILED),
-    String(StackStatus.IMPORT_COMPLETE),
-    String(StackStatus.IMPORT_ROLLBACK_COMPLETE),
-    String(StackStatus.IMPORT_ROLLBACK_FAILED),
-    String(StackStatus.ROLLBACK_COMPLETE),
-    String(StackStatus.ROLLBACK_FAILED),
-    String(StackStatus.UPDATE_COMPLETE),
-    String(StackStatus.UPDATE_FAILED),
-    String(StackStatus.UPDATE_ROLLBACK_COMPLETE),
-    String(StackStatus.UPDATE_ROLLBACK_FAILED),
+    StackStatus.CREATE_COMPLETE,
+    StackStatus.CREATE_FAILED,
+    StackStatus.DELETE_COMPLETE,
+    StackStatus.DELETE_FAILED,
+    StackStatus.IMPORT_COMPLETE,
+    StackStatus.IMPORT_ROLLBACK_COMPLETE,
+    StackStatus.IMPORT_ROLLBACK_FAILED,
+    StackStatus.ROLLBACK_COMPLETE,
+    StackStatus.ROLLBACK_FAILED,
+    StackStatus.UPDATE_COMPLETE,
+    StackStatus.UPDATE_FAILED,
+    StackStatus.UPDATE_ROLLBACK_COMPLETE,
+    StackStatus.UPDATE_ROLLBACK_FAILED,
   ]
-): Promise<string> {
+): Promise<StackStatus> {
   try {
     const stack = await describeStack(client, cfStackName);
-    const status = String(stack.StackStatus);
-    logStackStatus(status);
-    if (!completeOrFailedStatuses.includes(status)) {
+    logStackStatus(stack.StackStatus as StackStatus);
+    if (!completeOrFailedStatuses.includes(stack.StackStatus as StackStatus)) {
       await delay(delayMs);
       return await waitForCompleteOrFailed(client, cfStackName, delayMs);
     }
-    return status;
+    return stack.StackStatus as StackStatus;
   } catch (e) {
     throw e;
-  } finally {
-    resetStatusLogs();
   }
 }
 
-export async function deleteExistingStack(
+async function deleteExistingStack(
   client: CloudFormationClient,
   cfStackName: string
 ) {
@@ -253,21 +173,20 @@ export async function deleteExistingStack(
       StackName: cfStackName,
     })
   );
-  await waitForStackStatus(
-    client,
-    cfStackName,
-    String(StackStatus.DELETE_COMPLETE)
-  );
+  await waitForStackStatus(client, cfStackName, StackStatus.DELETE_COMPLETE);
   notice(`Stack ${cfStackName} successfully deleted`);
 }
 
-export function shouldDeleteExistingStack(stack: Stack): boolean {
-  // If the StackStatus is ROLLBACK_COMPLETE then we cannot update it
-  // and instead need to delete it and re-create it.
-  return stack.StackStatus === StackStatus.ROLLBACK_COMPLETE;
+function shouldDeleteExistingStack(stack: Stack): boolean {
+  // If the StackStatus is ROLLBACK_COMPLETE then we cannot update it.
+  // If the StackStatus is REVIEW_IN_PROGRESS then we can't update it.
+  return (
+    stack.StackStatus === StackStatus.ROLLBACK_COMPLETE ||
+    stack.StackStatus === StackStatus.REVIEW_IN_PROGRESS
+  );
 }
 
-export async function createChangeSet(
+async function createChangeSet(
   client: CloudFormationClient,
   cfStackName: string,
   changeSetType: ChangeSetType,
@@ -286,7 +205,7 @@ export async function createChangeSet(
   );
 }
 
-export async function deleteChangeSet(
+async function deleteChangeSet(
   client: CloudFormationClient,
   cfStackName: string,
   changeSetId: string
@@ -299,7 +218,7 @@ export async function deleteChangeSet(
   );
 }
 
-export async function describeChangeSet(
+async function describeChangeSet(
   client: CloudFormationClient,
   cfStackName: string,
   changeSetId: string,
@@ -325,7 +244,7 @@ export async function describeChangeSet(
       response.NextToken
     );
   }
-  logChangeSetStatus(String(response.Status));
+  logChangeSetStatus(response.Status as ChangeSetStatus);
   if (response.Status !== ChangeSetStatus.CREATE_COMPLETE) {
     await delay(delayMs);
     return await describeChangeSet(
@@ -335,11 +254,10 @@ export async function describeChangeSet(
       response.NextToken
     );
   }
-  resetChangeSetStatusLogs();
   return response.Changes || [];
 }
 
-export async function getChanges(
+async function getChanges(
   client: CloudFormationClient,
   cfStackName: string,
   changeSet: CreateChangeSetCommandOutput
@@ -351,7 +269,7 @@ export async function getChanges(
   return describeChangeSet(client, cfStackName, changeSet.Id);
 }
 
-export async function getChangeSetType(
+async function getChangeSetType(
   client: CloudFormationClient,
   cfStackName: string,
   parameters: Parameter[]
@@ -367,12 +285,16 @@ export async function getChangeSetType(
 
   let update = false;
 
+  // When a ChangeSet is created for a stack that does not exist, a stack will be
+  // created with status REVIEW_IN_PROGRESS, and we can't generate a new
+  // ChangeSet against this stack, which is why we have to delete it first.
+
   if (hasExistingStack) {
     const stack = await describeStack(client, cfStackName);
-    const shouldDelete = await shouldDeleteExistingStack(stack);
+    const shouldDelete = shouldDeleteExistingStack(stack);
     if (shouldDelete) {
       warning(
-        `Deleting existing stack ${cfStackName}, due to ${StackStatus.ROLLBACK_COMPLETE} status`
+        `Deleting existing stack ${cfStackName}, due to ${stack.StackStatus} status`
       );
       await deleteExistingStack(client, cfStackName);
     } else {
@@ -383,48 +305,73 @@ export async function getChangeSetType(
   return update ? ChangeSetType.UPDATE : ChangeSetType.CREATE;
 }
 
+async function validateTemplate(
+  client: CloudFormationClient,
+  templateBody: string
+): Promise<void> {
+  await client.send(
+    new ValidateTemplateCommand({
+      TemplateBody: templateBody,
+    })
+  );
+}
+
+export function getCloudFormationParameters(
+  parametersQuery: string
+): Parameter[] {
+  const params = new URLSearchParams(parametersQuery);
+  const cfParams: Parameter[] = [];
+  for (const key of params.keys()) {
+    cfParams.push({
+      ParameterKey: key.trim(),
+      ParameterValue: params.get(key)?.trim() || undefined,
+    });
+  }
+  return cfParams;
+}
+
 export async function updateCloudFormationStack(
-  cloudFormationClient: CloudFormationClient,
+  client: CloudFormationClient,
   cfStackName: string,
-  githubToken: string,
+  gitHubToken: string,
   preview: boolean,
   cfTemplateBody: string,
   cfParameters: Parameter[]
 ): Promise<Change[]> {
+  await validateTemplate(client, cfTemplateBody);
   const changeSetType = await getChangeSetType(
-    cloudFormationClient,
+    client,
     cfStackName,
     cfParameters
   );
 
   const changeSet = await createChangeSet(
-    cloudFormationClient,
+    client,
     cfStackName,
     changeSetType,
     cfTemplateBody,
     cfParameters
   );
 
-  const changes = await getChanges(
-    cloudFormationClient,
-    cfStackName,
-    changeSet
-  );
+  const changes = await getChanges(client, cfStackName, changeSet);
 
   if (changeSet.Id) {
     if (changes.length) {
       if (!preview) {
         info(`Applying ChangeSet, this can take a while...`);
-        await applyChangeSet(cloudFormationClient, cfStackName, changeSet.Id);
+        await applyChangeSet(client, cfStackName, changeSet.Id);
         notice(`Successfully applied Stack ChangeSet`);
       }
     } else {
       info('(No Stack changes)');
-      await deleteChangeSet(cloudFormationClient, cfStackName, changeSet.Id);
+      await deleteChangeSet(client, cfStackName, changeSet.Id);
       info('Successfully deleted ChangeSet');
     }
-    await deletePRComment(githubToken);
-    await addPRCommentWithChangeSet(changes, githubToken, preview);
+    if (rollbackDetected) {
+      throw new Error('Rollback detected, stack creation failed');
+    } else {
+      await addPRCommentWithChangeSet(changes, gitHubToken, preview);
+    }
   }
 
   return changes;
