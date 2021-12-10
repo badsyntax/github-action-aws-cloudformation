@@ -32,7 +32,7 @@ function getStackChangesMessage(
   return changes.length
     ? changeSetTable
     : `
-(No Stack changes)
+✔️ No Stack changes
 `;
 }
 

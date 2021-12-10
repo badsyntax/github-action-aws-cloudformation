@@ -37470,7 +37470,7 @@ function getStackChangesMessage(changes, changeSetTable) {
     return changes.length
         ? changeSetTable
         : `
-(No Stack changes)
+✔️ No Stack changes
 `;
 }
 function getCommentMarkdown(changes, changeSetTable) {
@@ -37748,7 +37748,7 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, previ
         if (rollbackDetected) {
             throw new Error('Rollback detected, stack creation failed');
         }
-        else {
+        else if (isPullRequest) {
             await addPRCommentWithChangeSet(changes, gitHubToken, preview);
         }
     }
