@@ -4,20 +4,6 @@
 
 A GitHub Action to create/update your CloudFormation stack.
 
-## ChangeSet Overview in Pull Requests
-
-Pull request created and `applyChangeSet` is `false`:
-
-<img src="./images/changeset-changes-comment.png" style="max-width: 700px" alt="Pull Request Comment" />
-
-Pull request created and `applyChangeSet` is `true`:
-
-<img src="./images/changeset-apply-comment.png" style="max-width: 700px" alt="Pull Request Comment" />
-
-No stack changes:
-
-<img src="./images/changeset-no-changes.png" style="max-width: 700px" alt="Pull Request Comment" />
-
 ## Getting Started
 
 ### Credentials and Region
@@ -77,6 +63,20 @@ jobs:
           # Use outputs from the CloudFormation Stack
           S3BucketName: ${{ steps.update-stack.outputs.S3BucketName }}
 ```
+
+## ChangeSet Overview in Pull Requests
+
+Pull request created and `applyChangeSet` is `false`:
+
+<img src="./images/changeset-changes-comment.png" style="max-width: 700px" alt="Pull Request Comment" />
+
+Pull request created and `applyChangeSet` is `true`:
+
+<img src="./images/changeset-apply-comment.png" style="max-width: 700px" alt="Pull Request Comment" />
+
+No stack changes:
+
+<img src="./images/changeset-no-changes.png" style="max-width: 700px" alt="Pull Request Comment" />
 
 ## Debugging
 

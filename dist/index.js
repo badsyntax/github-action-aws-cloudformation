@@ -37482,17 +37482,18 @@ function getOutputsTable(stack) {
         align: headings[0].map(() => 'l'),
     });
 }
-function getStackChangesMessage(changeSetTable) {
-    return changeSetTable
-        ? `**ChangeSet:**\n\n${changeSetTable}`
-        : `✔️ No Stack changes
-`;
+function getStackChangesMessage(changeSetTable, applyChangeSet) {
+    return `**ChangeSet**\n\n${changeSetTable
+        ? `${applyChangeSet
+            ? 'The following Stack changes have been applied:\n\n'
+            : 'The following Stack changes will be applied:\n\n'}${changeSetTable}`
+        : '✔️ No Stack changes'}`;
 }
 function getStackOutputsMessage(outputsTable) {
-    return outputsTable ? `**Outputs:**\n\n${outputsTable}` : '';
+    return outputsTable ? `**Outputs**\n\n${outputsTable}` : '';
 }
-function getCommentMarkdown(changeSetTable, outputsTable) {
-    const changesMessage = getStackChangesMessage(changeSetTable);
+function getCommentMarkdown(changeSetTable, outputsTable, applyChangeSet) {
+    const changesMessage = getStackChangesMessage(changeSetTable, applyChangeSet);
     const outputsMessage = getStackOutputsMessage(outputsTable);
     return `${changesMessage}${outputsMessage ? '\n\n' : ''}${outputsMessage}`;
 }
@@ -37522,7 +37523,7 @@ async function addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, s
     await maybeDeletePRComment(gitHubToken);
     const changeSetTable = getChangeSetTable(changes, applyChangeSet);
     const outputsTable = stack ? getOutputsTable(stack) : '';
-    const markdown = getCommentMarkdown(changeSetTable, outputsTable);
+    const markdown = getCommentMarkdown(changeSetTable, outputsTable, applyChangeSet);
     const issue = github.context.issue;
     const commentId = generateCommentId(issue);
     const body = `${commentId}\n\n${markdown}`;
