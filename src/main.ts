@@ -21,7 +21,7 @@ export async function run(): Promise<void> {
 
     const inputs = getInputs();
 
-    debug(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
+    debug(`Inputs:\n${JSON.stringify(inputs, null, 2)}`);
 
     const cfTemplateBody = fs.readFileSync(
       path.resolve(inputs.template),
@@ -49,11 +49,7 @@ export async function run(): Promise<void> {
       const cfParameters = getCloudFormationParameters(inputs.parameters);
 
       debug(
-        `CloudFormation template params:\n${JSON.stringify(
-          cfParameters,
-          null,
-          2
-        )}`
+        `CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`
       );
 
       const result = await updateCloudFormationStack(
@@ -64,8 +60,6 @@ export async function run(): Promise<void> {
         cfTemplateBody,
         cfParameters
       );
-
-      debug(`Result:\n\n${JSON.stringify(result, null, 2)}`);
 
       if (result.stack?.Outputs) {
         logOutputParameters(result.stack.Outputs);
