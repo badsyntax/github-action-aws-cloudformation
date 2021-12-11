@@ -361,7 +361,7 @@ export async function updateCloudFormationStack(
 
   const changes = await getChanges(client, cfStackName, changeSet);
 
-  const stack: Stack | undefined = undefined;
+  let stack: Stack | undefined = undefined;
 
   if (changeSet.Id) {
     if (changes.length) {
@@ -375,10 +375,14 @@ export async function updateCloudFormationStack(
       await deleteChangeSet(client, cfStackName, changeSet.Id);
       info('Successfully deleted ChangeSet');
     }
+
     if (rollbackDetected) {
       throw new Error('Rollback detected, stack creation failed');
-    } else if (isPullRequest) {
-      const stack = await describeStack(client, cfStackName);
+    } else {
+      stack = await describeStack(client, cfStackName);
+    }
+
+    if (isPullRequest) {
       await addPRCommentWithChangeSet(
         changes,
         gitHubToken,

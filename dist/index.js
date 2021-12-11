@@ -37761,7 +37761,7 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, apply
     const changeSetType = await getChangeSetType(client, cfStackName, cfParameters);
     const changeSet = await createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, cfParameters);
     const changes = await getChanges(client, cfStackName, changeSet);
-    const stack = undefined;
+    let stack = undefined;
     if (changeSet.Id) {
         if (changes.length) {
             if (applyChangeSet) {
@@ -37778,8 +37778,10 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, apply
         if (rollbackDetected) {
             throw new Error('Rollback detected, stack creation failed');
         }
-        else if (isPullRequest) {
-            const stack = await describeStack(client, cfStackName);
+        else {
+            stack = await describeStack(client, cfStackName);
+        }
+        if (isPullRequest) {
             await addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, stack);
         }
     }
