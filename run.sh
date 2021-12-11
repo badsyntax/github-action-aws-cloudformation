@@ -7,4 +7,5 @@ INPUT_STACKNAME="richardwillis-github-action-example-cloudformation-stack" \
     INPUT_PARAMETERS="S3BucketName=richardwillis.info-example-bucket-us-east-1&S3AllowedOrigins=https://richardwillis.info" \
     GITHUB_EVENT_NAME="pull_request" \
     GITHUB_ACTION="synchronize" \
+    GITHUB_REPOSITORY="badsyntax/github-action-aws-cloudformation" \
     node lib/main.js

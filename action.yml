@@ -20,7 +20,7 @@ inputs:
   parameters:
     description: 'The parameters to override in the stack inputs as a query string. For example: "Param1=foo&Param2=http://example.com"'
     required: false
-  preview:
+  applyChangeSet:
     required: false
     description: 'Whether to show the ChangeSet as a Pull Request comment'
 runs:
