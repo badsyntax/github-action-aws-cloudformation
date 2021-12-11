@@ -37444,6 +37444,7 @@ function toAlignment(value) {
 var _a;
 
 
+
 const isPullRequest = github.context.eventName === 'pull_request';
 const isPullRequestClosed = isPullRequest &&
     github.context.payload.action === 'closed';
@@ -37546,11 +37547,8 @@ function checkIsValidGitHubEvent() {
     throw new Error(`Invalid GitHub event: ${github.context.eventName}`);
 }
 function logOutputParameters(outputs) {
-    // eslint-disable-next-line no-console
-    console.log(`Outputs:\n\n${JSON.stringify(outputs, null, 2)}\n\n`);
     outputs.forEach((output) => {
-        // eslint-disable-next-line no-console
-        console.log(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
+        (0,core.info)(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
     });
 }
 
@@ -37841,7 +37839,7 @@ async function run() {
     try {
         checkIsValidGitHubEvent();
         const inputs = getInputs();
-        (0,core.debug)(`Inputs: ${JSON.stringify(inputs, null, 2)}`);
+        (0,core.debug)(`Inputs:\n${JSON.stringify(inputs, null, 2)}`);
         const cfTemplateBody = external_node_fs_namespaceObject.readFileSync(external_node_path_namespaceObject.resolve(inputs.template), 'utf8');
         const cloudFormationClient = new dist_cjs.CloudFormationClient({
             region: inputs.region,
@@ -37861,9 +37859,8 @@ async function run() {
         }
         else {
             const cfParameters = getCloudFormationParameters(inputs.parameters);
-            (0,core.debug)(`CloudFormation template params:\n${JSON.stringify(cfParameters, null, 2)}`);
+            (0,core.debug)(`CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`);
             const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.applyChangeSet, cfTemplateBody, cfParameters);
-            (0,core.debug)(`Result:\n\n${JSON.stringify(result, null, 2)}`);
             if ((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) {
                 logOutputParameters(result.stack.Outputs);
             }

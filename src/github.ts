@@ -2,6 +2,7 @@ import { Change, Output, Stack } from '@aws-sdk/client-cloudformation';
 import github from '@actions/github';
 import { markdownTable } from 'markdown-table';
 import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema';
+import { info } from '@actions/core';
 
 export const isPullRequest = github.context.eventName === 'pull_request';
 export const isPullRequestClosed =
@@ -130,10 +131,7 @@ export function checkIsValidGitHubEvent() {
 }
 
 export function logOutputParameters(outputs: Output[]): void {
-  // eslint-disable-next-line no-console
-  console.log(`Outputs:\n\n${JSON.stringify(outputs, null, 2)}\n\n`);
   outputs.forEach((output) => {
-    // eslint-disable-next-line no-console
-    console.log(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
+    info(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
   });
 }
