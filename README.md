@@ -20,6 +20,12 @@ No stack changes:
 
 ## Getting Started
 
+### Credentials and Region
+
+Please read <https://github.com/aws-actions/aws-cloudformation-github-deploy#credentials-and-region>
+
+### Actions yaml
+
 ```yaml
 name: 'deploy'
 
@@ -77,6 +83,12 @@ jobs:
 Check the Action output for logs.
 
 If you need to see more verbose logs you can set `ACTIONS_STEP_DEBUG` to `true` as an Action Secret.
+
+## Motivation
+
+I'd prefer not to have created this Action, but the [official CloudFormation action](https://github.com/aws-actions/aws-cloudformation-github-deploy) is archived with no explanation why.
+
+This Action will be actively maintained and also includes additional features like PR comments.
 
 ## License
 
