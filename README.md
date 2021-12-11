@@ -53,10 +53,11 @@ jobs:
         uses: badsyntax/github-action-aws-cloudformation@v0.0.1
         if:
         with:
+          # No need to create this token. Use the default token.
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           stackName: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
-          # Only apply the changeset on pushes to main/release
+          # Only apply the changeset on pushes to main/release
           applyChangeSet: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
           awsRegion: 'us-east-1'
           parameters: 'S3BucketName=example-bucket-us-east-1&S3AllowedOrigins=https://example.com'
