@@ -14,7 +14,7 @@ This Action is actively maintained and includes additional features.
 
 - Apply or Preview ChangeSet with Pull Request comments
 - Log intervals to show constant feedback
-- CloudFormation outputs set as Actions Outputs which can be used in subsequent steps
+- CloudFormation outputs set as Action Outputs which can be used in subsequent steps
 
 ## Getting Started
 
