@@ -37844,6 +37844,8 @@ async function run() {
         const cloudFormationClient = new dist_cjs.CloudFormationClient({
             region: inputs.region,
         });
+        (0,core.debug)(`isPullRequest: ${isPullRequest}`);
+        (0,core.debug)(`isPullRequestClosed: ${isPullRequestClosed}`);
         if (isPullRequestClosed) {
             if (!inputs.applyChangeSet) {
                 // FIXME

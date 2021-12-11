@@ -9,6 +9,7 @@ import {
 } from './cloudformation.js';
 import {
   checkIsValidGitHubEvent,
+  isPullRequest,
   isPullRequestClosed,
   logOutputParameters,
 } from './github.js';
@@ -30,6 +31,9 @@ export async function run(): Promise<void> {
     const cloudFormationClient = new CloudFormationClient({
       region: inputs.region,
     });
+
+    debug(`isPullRequest: ${isPullRequest}`);
+    debug(`isPullRequestClosed: ${isPullRequestClosed}`);
 
     if (isPullRequestClosed) {
       if (!inputs.applyChangeSet) {
