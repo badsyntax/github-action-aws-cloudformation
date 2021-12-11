@@ -1,6 +1,7 @@
 # AWS CloudFormation GitHub Action
 
 [![Update Stack](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml)
+[![CodeQL](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/codeql-analysis.yml)
 
 A GitHub Action to create/update your CloudFormation stack to support Infrastructure as Code. 
 
