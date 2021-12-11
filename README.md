@@ -1,5 +1,6 @@
 # AWS CloudFormation GitHub Action
 
+[![Build & Test](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/test.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/test.yml)
 [![Update Stack](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml)
 [![CodeQL](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/codeql-analysis.yml)
 
