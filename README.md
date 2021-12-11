@@ -8,7 +8,7 @@ A GitHub Action to create/update your CloudFormation stack.
 
 The [official CloudFormation action](https://github.com/aws-actions/aws-cloudformation-github-deploy) is archived with no explanation why.
 
-This Action will be actively maintained and also includes additional features like PR comments.
+This Action will be actively maintained and includes additional features like PR comments.
 
 ## Getting Started
 
