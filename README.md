@@ -2,13 +2,19 @@
 
 [![Update Stack](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml)
 
-A GitHub Action to create/update your CloudFormation stack.
+A GitHub Action to create/update your CloudFormation stack to support Infrastructure as Code. 
 
 ## Motivation
 
 The [official CloudFormation action](https://github.com/aws-actions/aws-cloudformation-github-deploy) is archived with no explanation why.
 
-This Action will be actively maintained and includes additional features like PR comments.
+This Action is actively maintained and includes additional features.
+
+## Features
+
+- Apply or Preview ChangeSet with Pull Request
+- Log intervals to show constant feedback
+- CloudFormation outputs set as Actions Outputs which can be used in subsequent steps
 
 ## Getting Started
 
