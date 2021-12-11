@@ -88,6 +88,11 @@ No stack changes:
 
 <img src="./images/changeset-no-changes.png" style="max-width: 700px" alt="Pull Request Comment" />
 
+## Related Projects
+
+- [github-action-aws-cloudfront](https://github.com/badsyntax/github-action-aws-cloudfront)
+- [github-action-aws-s3](https://github.com/badsyntax/github-action-aws-s3)
+
 ## Debugging
 
 Check the Action output for logs.
