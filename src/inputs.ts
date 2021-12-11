@@ -26,8 +26,8 @@ export function getInputs() {
     trimWhitespace: true,
   });
 
-  const preview =
-    getInput('preview', {
+  const applyChangeSet =
+    getInput('applyChangeSet', {
       required: true,
       trimWhitespace: true,
     }).toLowerCase() === 'true';
@@ -37,7 +37,7 @@ export function getInputs() {
     region,
     template,
     gitHubToken,
-    preview,
+    applyChangeSet,
     parameters,
   };
 }

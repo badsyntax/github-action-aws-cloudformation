@@ -1,7 +1,8 @@
-import { Change } from '@aws-sdk/client-cloudformation';
+import { Change, Output, Stack } from '@aws-sdk/client-cloudformation';
 import github from '@actions/github';
 import { markdownTable } from 'markdown-table';
 import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema';
+import { info } from '@actions/core';
 
 export const isPullRequest = github.context.eventName === 'pull_request';
 export const isPullRequestClosed =
@@ -9,39 +10,60 @@ export const isPullRequestClosed =
   (github.context.payload as PullRequestEvent).action === 'closed';
 export const prBranchName = github.context.payload.pull_request?.head.ref;
 
-function getChangeSetTable(changes: Change[], preview: boolean): string {
+function getChangeSetTable(changes: Change[], applyChangeSet: boolean): string {
   if (!changes.length) {
     return '';
   }
   const headings = [['', 'ResourceType', 'LogicalResourceId', 'Action']];
   const rows = changes.map((change) => [
-    preview ? '⚠️' : '✅',
+    applyChangeSet ? '✅' : '⚠️',
     String(change.ResourceChange?.ResourceType),
     String(change.ResourceChange?.LogicalResourceId),
     String(change.ResourceChange?.Action),
   ]);
   return markdownTable(headings.concat(rows), {
-    align: headings.map(() => 'l'),
+    align: headings[0].map(() => 'l'),
   });
 }
 
-function getStackChangesMessage(
-  changes: Change[],
-  changeSetTable: string
-): string {
-  return changes.length
-    ? changeSetTable
-    : `
-✔️ No Stack changes
+function getOutputsTable(stack: Stack): string {
+  const outputs = stack.Outputs || [];
+  if (!outputs.length) {
+    return '';
+  }
+  const headings = [['Key', 'Value', 'Description']];
+  const rows = outputs.map((output) => [
+    output.OutputKey || '',
+    output.OutputValue || '',
+    output.Description || '',
+  ]);
+  return markdownTable(headings.concat(rows), {
+    align: headings[0].map(() => 'l'),
+  });
+}
+
+function getStackChangesMessage(changeSetTable: string): string {
+  return changeSetTable
+    ? `**ChangeSet:**\n\n${changeSetTable}`
+    : `✔️ No Stack changes
 `;
 }
 
-function getCommentMarkdown(changes: Change[], changeSetTable: string): string {
-  return getStackChangesMessage(changes, changeSetTable);
+function getStackOutputsMessage(outputsTable: string): string {
+  return outputsTable ? `**Outputs:**\n\n${outputsTable}` : '';
+}
+
+function getCommentMarkdown(
+  changeSetTable: string,
+  outputsTable: string
+): string {
+  const changesMessage = getStackChangesMessage(changeSetTable);
+  const outputsMessage = getStackOutputsMessage(outputsTable);
+  return `${changesMessage}${outputsMessage ? '\n\n' : ''}${outputsMessage}`;
 }
 
 export function generateCommentId(issue: typeof github.context.issue): string {
-  return `AWS CloudFormation ChangeSet (ID:${issue.number})`;
+  return `AWS CloudFormation (ID:${issue.number})`;
 }
 
 export async function maybeDeletePRComment(gitHubToken: string): Promise<void> {
@@ -72,16 +94,19 @@ export async function maybeDeletePRComment(gitHubToken: string): Promise<void> {
 export async function addPRCommentWithChangeSet(
   changes: Change[],
   gitHubToken: string,
-  preview: boolean
+  applyChangeSet: boolean,
+  stack?: Stack
 ): Promise<void> {
   await maybeDeletePRComment(gitHubToken);
 
-  const changeSetTable = getChangeSetTable(changes, preview);
-  const markdown = getCommentMarkdown(changes, changeSetTable);
+  const changeSetTable = getChangeSetTable(changes, applyChangeSet);
+  const outputsTable = stack ? getOutputsTable(stack) : '';
+  const markdown = getCommentMarkdown(changeSetTable, outputsTable);
 
   const issue = github.context.issue;
   const commentId = generateCommentId(issue);
-  const body = `${commentId}\n${markdown}`;
+  const body = `${commentId}\n\n${markdown}`;
+
   const octokit = github.getOctokit(gitHubToken);
 
   await octokit.rest.issues.createComment({
@@ -103,4 +128,13 @@ export function checkIsValidGitHubEvent() {
       return ['opened', 'synchronize', 'reopened', 'closed'].includes(action);
   }
   throw new Error(`Invalid GitHub event: ${github.context.eventName}`);
+}
+
+export function logOutputParameters(outputs: Output[]): void {
+  // eslint-disable-next-line no-console
+  console.log(`Outputs:\n\n${JSON.stringify(outputs, null, 2)}\n\n`);
+  outputs.forEach((output) => {
+    // eslint-disable-next-line no-console
+    console.log(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
+  });
 }

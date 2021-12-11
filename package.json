@@ -11,8 +11,7 @@
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
     "package": "ncc build lib/main.js --source-map --license licenses.txt",
-    "test": "jest",
-    "all": "npm run lint && npm run format-check && npm run build && npm run package"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "engines": {
     "node": "^16",

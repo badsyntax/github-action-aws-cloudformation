@@ -7,7 +7,11 @@ import {
   getCloudFormationParameters,
   updateCloudFormationStack,
 } from './cloudformation.js';
-import { checkIsValidGitHubEvent, isPullRequestClosed } from './github.js';
+import {
+  checkIsValidGitHubEvent,
+  isPullRequestClosed,
+  logOutputParameters,
+} from './github.js';
 import { getInputs } from './inputs.js';
 
 export async function run(): Promise<void> {
@@ -28,7 +32,7 @@ export async function run(): Promise<void> {
     });
 
     if (isPullRequestClosed) {
-      if (inputs.preview) {
+      if (!inputs.applyChangeSet) {
         // FIXME
         // const changeSetId = '1234';
         // await deleteChangeSet(
@@ -48,14 +52,20 @@ export async function run(): Promise<void> {
         )}`
       );
 
-      await updateCloudFormationStack(
+      const result = await updateCloudFormationStack(
         cloudFormationClient,
         inputs.stackName,
         inputs.gitHubToken,
-        inputs.preview,
+        inputs.applyChangeSet,
         cfTemplateBody,
         cfParameters
       );
+
+      debug(`Result:\n\n${JSON.stringify(result, null, 2)}`);
+
+      if (result.stack?.Outputs) {
+        logOutputParameters(result.stack.Outputs);
+      }
     }
   } catch (error) {
     if (error instanceof Error) {

@@ -37448,7 +37448,7 @@ const isPullRequest = github.context.eventName === 'pull_request';
 const isPullRequestClosed = isPullRequest &&
     github.context.payload.action === 'closed';
 const prBranchName = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.ref;
-function getChangeSetTable(changes, preview) {
+function getChangeSetTable(changes, applyChangeSet) {
     if (!changes.length) {
         return '';
     }
@@ -37456,28 +37456,47 @@ function getChangeSetTable(changes, preview) {
     const rows = changes.map((change) => {
         var _a, _b, _c;
         return [
-            preview ? '⚠️' : '✅',
+            applyChangeSet ? '✅' : '⚠️',
             String((_a = change.ResourceChange) === null || _a === void 0 ? void 0 : _a.ResourceType),
             String((_b = change.ResourceChange) === null || _b === void 0 ? void 0 : _b.LogicalResourceId),
             String((_c = change.ResourceChange) === null || _c === void 0 ? void 0 : _c.Action),
         ];
     });
     return markdownTable(headings.concat(rows), {
-        align: headings.map(() => 'l'),
+        align: headings[0].map(() => 'l'),
     });
 }
-function getStackChangesMessage(changes, changeSetTable) {
-    return changes.length
-        ? changeSetTable
-        : `
-✔️ No Stack changes
+function getOutputsTable(stack) {
+    const outputs = stack.Outputs || [];
+    if (!outputs.length) {
+        return '';
+    }
+    const headings = [['Key', 'Value', 'Description']];
+    const rows = outputs.map((output) => [
+        output.OutputKey || '',
+        output.OutputValue || '',
+        output.Description || '',
+    ]);
+    return markdownTable(headings.concat(rows), {
+        align: headings[0].map(() => 'l'),
+    });
+}
+function getStackChangesMessage(changeSetTable) {
+    return changeSetTable
+        ? `**ChangeSet:**\n\n${changeSetTable}`
+        : `✔️ No Stack changes
 `;
 }
-function getCommentMarkdown(changes, changeSetTable) {
-    return getStackChangesMessage(changes, changeSetTable);
+function getStackOutputsMessage(outputsTable) {
+    return outputsTable ? `**Outputs:**\n\n${outputsTable}` : '';
+}
+function getCommentMarkdown(changeSetTable, outputsTable) {
+    const changesMessage = getStackChangesMessage(changeSetTable);
+    const outputsMessage = getStackOutputsMessage(outputsTable);
+    return `${changesMessage}${outputsMessage ? '\n\n' : ''}${outputsMessage}`;
 }
 function generateCommentId(issue) {
-    return `AWS CloudFormation ChangeSet (ID:${issue.number})`;
+    return `AWS CloudFormation (ID:${issue.number})`;
 }
 async function maybeDeletePRComment(gitHubToken) {
     const issue = github.context.issue;
@@ -37498,13 +37517,14 @@ async function maybeDeletePRComment(gitHubToken) {
         });
     }
 }
-async function addPRCommentWithChangeSet(changes, gitHubToken, preview) {
+async function addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, stack) {
     await maybeDeletePRComment(gitHubToken);
-    const changeSetTable = getChangeSetTable(changes, preview);
-    const markdown = getCommentMarkdown(changes, changeSetTable);
+    const changeSetTable = getChangeSetTable(changes, applyChangeSet);
+    const outputsTable = stack ? getOutputsTable(stack) : '';
+    const markdown = getCommentMarkdown(changeSetTable, outputsTable);
     const issue = github.context.issue;
     const commentId = generateCommentId(issue);
-    const body = `${commentId}\n${markdown}`;
+    const body = `${commentId}\n\n${markdown}`;
     const octokit = github.getOctokit(gitHubToken);
     await octokit.rest.issues.createComment({
         issue_number: issue.number,
@@ -37524,6 +37544,14 @@ function checkIsValidGitHubEvent() {
             return ['opened', 'synchronize', 'reopened', 'closed'].includes(action);
     }
     throw new Error(`Invalid GitHub event: ${github.context.eventName}`);
+}
+function logOutputParameters(outputs) {
+    // eslint-disable-next-line no-console
+    console.log(`Outputs:\n\n${JSON.stringify(outputs, null, 2)}\n\n`);
+    outputs.forEach((output) => {
+        // eslint-disable-next-line no-console
+        console.log(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
+    });
 }
 
 ;// CONCATENATED MODULE: ./lib/util.js
@@ -37586,12 +37614,13 @@ async function waitForStackStatus(client, cfStackName, status, delayMs = default
         (0,core.debug)(`Unable to wait for status ${status} because ${e.message}`);
     }
 }
-async function applyChangeSet(client, cfStackName, changeSetId) {
+async function applyChangeSetAndWait(client, cfStackName, changeSetId) {
     await client.send(new dist_cjs.ExecuteChangeSetCommand({
         StackName: cfStackName,
         ChangeSetName: changeSetId,
     }));
-    await waitForCompleteOrFailed(client, cfStackName);
+    const stack = await waitForCompleteOrFailed(client, cfStackName);
+    return stack;
 }
 async function describeStack(client, cfStackName) {
     var _a;
@@ -37625,7 +37654,7 @@ async function waitForCompleteOrFailed(client, cfStackName, delayMs = defaultDel
             await delay(delayMs);
             return await waitForCompleteOrFailed(client, cfStackName, delayMs);
         }
-        return stack.StackStatus;
+        return stack;
     }
     catch (e) {
         throw e;
@@ -37694,7 +37723,7 @@ async function getChangeSetType(client, cfStackName, parameters) {
         .map((p) => `${p.ParameterKey}: ${p.ParameterValue}`)
         .join(', ')}`);
     let update = false;
-    // When a ChangeSet is created for a stack that does not exist, a stack will be
+    // When a ChangeSet is created for a stack that does not exist, a new stack will be
     // created with status REVIEW_IN_PROGRESS, and we can't generate a new
     // ChangeSet against this stack, which is why we have to delete it first.
     if (hasExistingStack) {
@@ -37727,16 +37756,17 @@ function getCloudFormationParameters(parametersQuery) {
     }
     return cfParams;
 }
-async function updateCloudFormationStack(client, cfStackName, gitHubToken, preview, cfTemplateBody, cfParameters) {
+async function updateCloudFormationStack(client, cfStackName, gitHubToken, applyChangeSet, cfTemplateBody, cfParameters) {
     await validateTemplate(client, cfTemplateBody);
     const changeSetType = await getChangeSetType(client, cfStackName, cfParameters);
     const changeSet = await createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, cfParameters);
     const changes = await getChanges(client, cfStackName, changeSet);
+    const stack = undefined;
     if (changeSet.Id) {
         if (changes.length) {
-            if (!preview) {
+            if (applyChangeSet) {
                 (0,core.info)(`Applying ChangeSet, this can take a while...`);
-                await applyChangeSet(client, cfStackName, changeSet.Id);
+                await applyChangeSetAndWait(client, cfStackName, changeSet.Id);
                 (0,core.notice)(`Successfully applied Stack ChangeSet`);
             }
         }
@@ -37749,10 +37779,14 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, previ
             throw new Error('Rollback detected, stack creation failed');
         }
         else if (isPullRequest) {
-            await addPRCommentWithChangeSet(changes, gitHubToken, preview);
+            const stack = await describeStack(client, cfStackName);
+            await addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, stack);
         }
     }
-    return changes;
+    return {
+        changes,
+        stack,
+    };
 }
 
 ;// CONCATENATED MODULE: ./lib/inputs.js
@@ -37778,7 +37812,7 @@ function getInputs() {
         required: true,
         trimWhitespace: true,
     });
-    const preview = (0,core.getInput)('preview', {
+    const applyChangeSet = (0,core.getInput)('applyChangeSet', {
         required: true,
         trimWhitespace: true,
     }).toLowerCase() === 'true';
@@ -37787,7 +37821,7 @@ function getInputs() {
         region,
         template,
         gitHubToken,
-        preview,
+        applyChangeSet,
         parameters,
     };
 }
@@ -37801,6 +37835,7 @@ function getInputs() {
 
 
 async function run() {
+    var _a;
     try {
         checkIsValidGitHubEvent();
         const inputs = getInputs();
@@ -37810,7 +37845,7 @@ async function run() {
             region: inputs.region,
         });
         if (isPullRequestClosed) {
-            if (inputs.preview) {
+            if (!inputs.applyChangeSet) {
                 // FIXME
                 // const changeSetId = '1234';
                 // await deleteChangeSet(
@@ -37823,7 +37858,11 @@ async function run() {
         else {
             const cfParameters = getCloudFormationParameters(inputs.parameters);
             (0,core.debug)(`CloudFormation template params:\n${JSON.stringify(cfParameters, null, 2)}`);
-            await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.preview, cfTemplateBody, cfParameters);
+            const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.applyChangeSet, cfTemplateBody, cfParameters);
+            (0,core.debug)(`Result:\n\n${JSON.stringify(result, null, 2)}`);
+            if ((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) {
+                logOutputParameters(result.stack.Outputs);
+            }
         }
     }
     catch (error) {

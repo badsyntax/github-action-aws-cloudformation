@@ -1,4 +1,4 @@
-name: 'Deploy Stack'
+name: 'Update Stack'
 
 concurrency:
   group: prod_deploy
@@ -26,17 +26,28 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Set create stack
-        id: createstack
-        run: echo "::set-output name=createstack::$CREATE_STACK"
-        env:
-          CREATE_STACK: ${{ github.event_name != 'repository_dispatch' }}
+      # - name: Set create stack
+      #   id: createstack
+      #   run: echo "::set-output name=createstack::$CREATE_STACK"
+      #   env:
+      #     CREATE_STACK: ${{ github.event_name != 'repository_dispatch' }}
       - uses: ./
-        name: Deploy Stack
+        name: Update CloudFormation Stack
+        id: update-stack
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           stackName: 'richardwillis-github-action-example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
-          preview: false
+          # Only apply the changeset on pushes to main/release
+          applyChangeSet: ${{ github.event_name != 'repository_dispatch' }}
           awsRegion: 'us-east-1'
           parameters: 'S3BucketName=richardwillis.info-example-bucket-us-east-1&S3AllowedOrigins=https://richardwillis.info'
+
+      - name: Deploy Website
+        run: |
+          # Now that the stack is created we can deploy our
+          # website to the S3 bucket.
+          echo "Deploy to S3 Bucket: $S3BucketName"
+        env:
+          # Use outputs from the CloudFormation Stack
+          S3BucketName: ${{ steps.update-stack.outputs.S3BucketName }}

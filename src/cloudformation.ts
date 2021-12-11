@@ -102,18 +102,19 @@ async function waitForStackStatus(
   }
 }
 
-async function applyChangeSet(
+async function applyChangeSetAndWait(
   client: CloudFormationClient,
   cfStackName: string,
   changeSetId: string
-): Promise<void> {
+): Promise<Stack> {
   await client.send(
     new ExecuteChangeSetCommand({
       StackName: cfStackName,
       ChangeSetName: changeSetId,
     })
   );
-  await waitForCompleteOrFailed(client, cfStackName);
+  const stack = await waitForCompleteOrFailed(client, cfStackName);
+  return stack;
 }
 
 async function describeStack(
@@ -150,7 +151,7 @@ async function waitForCompleteOrFailed(
     StackStatus.UPDATE_ROLLBACK_COMPLETE,
     StackStatus.UPDATE_ROLLBACK_FAILED,
   ]
-): Promise<StackStatus> {
+): Promise<Stack> {
   try {
     const stack = await describeStack(client, cfStackName);
     logStackStatus(stack.StackStatus as StackStatus);
@@ -158,7 +159,7 @@ async function waitForCompleteOrFailed(
       await delay(delayMs);
       return await waitForCompleteOrFailed(client, cfStackName, delayMs);
     }
-    return stack.StackStatus as StackStatus;
+    return stack;
   } catch (e) {
     throw e;
   }
@@ -285,7 +286,7 @@ async function getChangeSetType(
 
   let update = false;
 
-  // When a ChangeSet is created for a stack that does not exist, a stack will be
+  // When a ChangeSet is created for a stack that does not exist, a new stack will be
   // created with status REVIEW_IN_PROGRESS, and we can't generate a new
   // ChangeSet against this stack, which is why we have to delete it first.
 
@@ -330,14 +331,19 @@ export function getCloudFormationParameters(
   return cfParams;
 }
 
+type UpdateCloudFormationStackResponse = {
+  changes: Change[];
+  stack?: Stack;
+};
+
 export async function updateCloudFormationStack(
   client: CloudFormationClient,
   cfStackName: string,
   gitHubToken: string,
-  preview: boolean,
+  applyChangeSet: boolean,
   cfTemplateBody: string,
   cfParameters: Parameter[]
-): Promise<Change[]> {
+): Promise<UpdateCloudFormationStackResponse> {
   await validateTemplate(client, cfTemplateBody);
   const changeSetType = await getChangeSetType(
     client,
@@ -355,11 +361,13 @@ export async function updateCloudFormationStack(
 
   const changes = await getChanges(client, cfStackName, changeSet);
 
+  const stack: Stack | undefined = undefined;
+
   if (changeSet.Id) {
     if (changes.length) {
-      if (!preview) {
+      if (applyChangeSet) {
         info(`Applying ChangeSet, this can take a while...`);
-        await applyChangeSet(client, cfStackName, changeSet.Id);
+        await applyChangeSetAndWait(client, cfStackName, changeSet.Id);
         notice(`Successfully applied Stack ChangeSet`);
       }
     } else {
@@ -370,9 +378,18 @@ export async function updateCloudFormationStack(
     if (rollbackDetected) {
       throw new Error('Rollback detected, stack creation failed');
     } else if (isPullRequest) {
-      await addPRCommentWithChangeSet(changes, gitHubToken, preview);
+      const stack = await describeStack(client, cfStackName);
+      await addPRCommentWithChangeSet(
+        changes,
+        gitHubToken,
+        applyChangeSet,
+        stack
+      );
     }
   }
 
-  return changes;
+  return {
+    changes,
+    stack,
+  };
 }
