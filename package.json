@@ -7,8 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "format": "prettier --write '**/*.ts'",
-    "format-check": "prettier --check '**/*.ts'",
+    "format": "prettier --write '**/*.{json,svg,md,yml,ts}'",
+    "format-check": "prettier --check '**/*.{json,svg,md,yml,ts}'",
     "lint": "eslint src/**/*.ts",
     "package": "ncc build lib/main.js --source-map --license licenses.txt",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
@@ -26,7 +26,7 @@
     "node",
     "setup",
     "aws",
-    "cloudfront"
+    "cloudformation"
   ],
   "author": "Richard Willis <willis.rh@gmail.com>",
   "license": "MIT",

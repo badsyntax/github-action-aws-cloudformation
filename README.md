@@ -4,7 +4,7 @@
 [![Update Stack](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/deploy-stack.yml)
 [![CodeQL](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/badsyntax/github-action-aws-cloudformation/actions/workflows/codeql-analysis.yml)
 
-A GitHub Action to create/update your CloudFormation stack to support Infrastructure as Code. 
+A GitHub Action to create/update your CloudFormation stack to support Infrastructure as Code.
 
 ## Motivation
 
@@ -74,7 +74,18 @@ jobs:
           S3BucketName: ${{ steps.update-stack.outputs.S3BucketName }}
 ```
 
-## ChangeSet Overview in Pull Requests
+## Action Inputs
+
+| key              | description                                                                                         | example                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `stackName`      | The name of the Cloudformation stack to be created                                                  | `example-com-static-cloudformation-stack`       |
+| `template`       | The relative path to the CloudFormation stack template                                              | `./cloudformation/s3bucket_with_cloudfront.yml` |
+| `gitHubToken`    | GitHub Token used for commenting on Pull Requests                                                   | `${{ secrets.GITHUB_TOKEN }}`                   |
+| `awsRegion`      | The AWS region in which to create the stack                                                         | `us-east-1`                                     |
+| `parameters`     | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped | `Param1=foo&Param2=http://example.com`          |
+| `applyChangeSet` | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                               | `true`                                          |
+
+## ChangeSet ScreenShots
 
 Pull request created and `applyChangeSet` is `false`:
 

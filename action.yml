@@ -1,5 +1,5 @@
-name: 'AWS CloudFormation'
-description: 'Create a CloudFormation Stack from a template.'
+name: 'AWS CloudFormation Update'
+description: 'Create or Update a CloudFormation Stack from a template'
 author: 'Richard Willis <willis.rh@gmail.com>'
 branding:
   icon: 'upload-cloud'
@@ -7,18 +7,18 @@ branding:
 inputs:
   stackName:
     required: true
-    description: 'The name of the Cloudformation stack to be created. For example: "example-com-static-cloudformation-stack"'
+    description: 'The name of the Cloudformation stack to be created. For example: example-com-static-cloudformation-stack'
   template:
     required: true
-    description: 'The relative path to the CloudFormation stack template. For example: "./cloudformation/s3bucket_with_cloudfront.yml"'
+    description: 'The relative path to the CloudFormation stack template. For example: ./cloudformation/s3bucket_with_cloudfront.yml'
   gitHubToken:
     required: true
     description: 'GitHub Token used for commenting on Pull Requests. Use the default GITHUB_TOKEN from secrets.'
   awsRegion:
     require: true
-    description: 'The AWS region in which to create the stack. For example: "us-east-1"'
+    description: 'The AWS region in which to create the stack. For example: us-east-1'
   parameters:
-    description: 'The parameters to override in the stack inputs as a query string. For example: "Param1=foo&Param2=http://example.com"'
+    description: 'The parameters to override in the stack inputs as a query string. For example: Param1=foo&Param2=http://example.com'
     required: false
   applyChangeSet:
     required: false
