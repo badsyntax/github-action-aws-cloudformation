@@ -37780,7 +37780,7 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, apply
         else {
             stack = await describeStack(client, cfStackName);
         }
-        if (isPullRequest) {
+        if (isPullRequest && !isPullRequestClosed) {
             await addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, stack);
         }
     }
@@ -37845,26 +37845,11 @@ async function run() {
         const cloudFormationClient = new dist_cjs.CloudFormationClient({
             region: inputs.region,
         });
-        (0,core.debug)(`isPullRequest: ${isPullRequest}`);
-        (0,core.debug)(`isPullRequestClosed: ${isPullRequestClosed}`);
-        if (isPullRequestClosed) {
-            if (!inputs.applyChangeSet) {
-                // FIXME
-                // const changeSetId = '1234';
-                // await deleteChangeSet(
-                //   cloudFormationClient,
-                //   inputs.stackName,
-                //   changeSetId
-                // );
-            }
-        }
-        else {
-            const cfParameters = getCloudFormationParameters(inputs.parameters);
-            (0,core.debug)(`CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`);
-            const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.applyChangeSet, cfTemplateBody, cfParameters);
-            if ((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) {
-                logOutputParameters(result.stack.Outputs);
-            }
+        const cfParameters = getCloudFormationParameters(inputs.parameters);
+        (0,core.debug)(`CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`);
+        const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.applyChangeSet, cfTemplateBody, cfParameters);
+        if ((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) {
+            logOutputParameters(result.stack.Outputs);
         }
     }
     catch (error) {

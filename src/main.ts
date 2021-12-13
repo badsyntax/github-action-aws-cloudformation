@@ -7,12 +7,7 @@ import {
   getCloudFormationParameters,
   updateCloudFormationStack,
 } from './cloudformation.js';
-import {
-  checkIsValidGitHubEvent,
-  isPullRequest,
-  isPullRequestClosed,
-  logOutputParameters,
-} from './github.js';
+import { checkIsValidGitHubEvent, logOutputParameters } from './github.js';
 import { getInputs } from './inputs.js';
 
 export async function run(): Promise<void> {
@@ -32,38 +27,23 @@ export async function run(): Promise<void> {
       region: inputs.region,
     });
 
-    debug(`isPullRequest: ${isPullRequest}`);
-    debug(`isPullRequestClosed: ${isPullRequestClosed}`);
+    const cfParameters = getCloudFormationParameters(inputs.parameters);
 
-    if (isPullRequestClosed) {
-      if (!inputs.applyChangeSet) {
-        // FIXME
-        // const changeSetId = '1234';
-        // await deleteChangeSet(
-        //   cloudFormationClient,
-        //   inputs.stackName,
-        //   changeSetId
-        // );
-      }
-    } else {
-      const cfParameters = getCloudFormationParameters(inputs.parameters);
+    debug(
+      `CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`
+    );
 
-      debug(
-        `CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`
-      );
+    const result = await updateCloudFormationStack(
+      cloudFormationClient,
+      inputs.stackName,
+      inputs.gitHubToken,
+      inputs.applyChangeSet,
+      cfTemplateBody,
+      cfParameters
+    );
 
-      const result = await updateCloudFormationStack(
-        cloudFormationClient,
-        inputs.stackName,
-        inputs.gitHubToken,
-        inputs.applyChangeSet,
-        cfTemplateBody,
-        cfParameters
-      );
-
-      if (result.stack?.Outputs) {
-        logOutputParameters(result.stack.Outputs);
-      }
+    if (result.stack?.Outputs) {
+      logOutputParameters(result.stack.Outputs);
     }
   } catch (error) {
     if (error instanceof Error) {
