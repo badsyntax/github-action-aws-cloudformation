@@ -55,7 +55,6 @@ jobs:
         uses: badsyntax/github-action-aws-cloudformation@master
         if:
         with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
           stack-name: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
           # Only apply the changeset on pushes to main/release
@@ -130,7 +129,6 @@ jobs:
         uses: badsyntax/github-action-aws-cloudformation@master
         if:
         with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
           stack-name: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
           # Only apply the changeset on pushes to main/release

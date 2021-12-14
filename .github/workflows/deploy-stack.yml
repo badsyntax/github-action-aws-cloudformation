@@ -31,7 +31,6 @@ jobs:
         name: Update CloudFormation Stack
         id: update-stack
         with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
           stack-name: 'badsyntax-github-action-example-aws-cloudformation'
           template: './cloudformation/s3bucket-example.yml'
           apply-change-set: ${{ github.event_name != 'repository_dispatch' }}
