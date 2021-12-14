@@ -1,75 +1,13 @@
-import { Change, Output, Stack } from '@aws-sdk/client-cloudformation';
+import { Change, Output } from '@aws-sdk/client-cloudformation';
 import github from '@actions/github';
-import { markdownTable } from 'markdown-table';
 import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema';
-import { info } from '@actions/core';
+import { setOutput } from '@actions/core';
 
 export const isPullRequest = github.context.eventName === 'pull_request';
 export const isPullRequestClosed =
   isPullRequest &&
   (github.context.payload as PullRequestEvent).action === 'closed';
 export const prBranchName = github.context.payload.pull_request?.head.ref;
-
-function getChangeSetTable(changes: Change[], applyChangeSet: boolean): string {
-  if (!changes.length) {
-    return '';
-  }
-  const headings = [['', 'ResourceType', 'LogicalResourceId', 'Action']];
-  const rows = changes.map((change) => [
-    applyChangeSet ? '✅' : '⚠️',
-    String(change.ResourceChange?.ResourceType),
-    String(change.ResourceChange?.LogicalResourceId),
-    String(change.ResourceChange?.Action),
-  ]);
-  return markdownTable(headings.concat(rows), {
-    align: headings[0].map(() => 'l'),
-  });
-}
-
-function getOutputsTable(stack: Stack): string {
-  const outputs = stack.Outputs || [];
-  if (!outputs.length) {
-    return '';
-  }
-  const headings = [['Key', 'Value', 'Description']];
-  const rows = outputs.map((output) => [
-    output.OutputKey || '',
-    output.OutputValue || '',
-    output.Description || '',
-  ]);
-  return markdownTable(headings.concat(rows), {
-    align: headings[0].map(() => 'l'),
-  });
-}
-
-function getStackChangesMessage(
-  changeSetTable: string,
-  applyChangeSet: boolean
-): string {
-  return `**ChangeSet**\n\n${
-    changeSetTable
-      ? `${
-          applyChangeSet
-            ? 'The following Stack changes have been applied:\n\n'
-            : 'The following Stack changes will be applied:\n\n'
-        }${changeSetTable}`
-      : '✔️ No Stack changes'
-  }`;
-}
-
-function getStackOutputsMessage(outputsTable: string): string {
-  return outputsTable ? `**Outputs**\n\n${outputsTable}` : '';
-}
-
-function getCommentMarkdown(
-  changeSetTable: string,
-  outputsTable: string,
-  applyChangeSet: boolean
-): string {
-  const changesMessage = getStackChangesMessage(changeSetTable, applyChangeSet);
-  const outputsMessage = getStackOutputsMessage(outputsTable);
-  return `${changesMessage}${outputsMessage ? '\n\n' : ''}${outputsMessage}`;
-}
 
 export function generateCommentId(issue: typeof github.context.issue): string {
   return `AWS CloudFormation (ID:${issue.number})`;
@@ -100,36 +38,6 @@ export async function maybeDeletePRComment(gitHubToken: string): Promise<void> {
   }
 }
 
-export async function addPRCommentWithChangeSet(
-  changes: Change[],
-  gitHubToken: string,
-  applyChangeSet: boolean,
-  stack?: Stack
-): Promise<void> {
-  await maybeDeletePRComment(gitHubToken);
-
-  const changeSetTable = getChangeSetTable(changes, applyChangeSet);
-  const outputsTable = stack ? getOutputsTable(stack) : '';
-  const markdown = getCommentMarkdown(
-    changeSetTable,
-    outputsTable,
-    applyChangeSet
-  );
-
-  const issue = github.context.issue;
-  const commentId = generateCommentId(issue);
-  const body = `${commentId}\n\n${markdown}`;
-
-  const octokit = github.getOctokit(gitHubToken);
-
-  await octokit.rest.issues.createComment({
-    issue_number: issue.number,
-    body: body,
-    owner: issue.owner,
-    repo: issue.repo,
-  });
-}
-
 export function checkIsValidGitHubEvent() {
   const action = github.context.action;
   switch (github.context.eventName) {
@@ -145,6 +53,13 @@ export function checkIsValidGitHubEvent() {
 
 export function logOutputParameters(outputs: Output[]): void {
   outputs.forEach((output) => {
-    info(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
+    if (output.OutputKey) {
+      setOutput(output.OutputKey, output.OutputValue);
+    }
   });
+  setOutput('outputs', JSON.stringify(outputs));
+}
+
+export function logChanges(changes: Change[]): void {
+  setOutput('changes', JSON.stringify(changes));
 }

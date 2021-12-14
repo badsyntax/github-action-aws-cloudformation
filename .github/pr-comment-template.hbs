@@ -1,0 +1,31 @@
+**ChangeSet**
+
+{{#if inputs.changes.length}}
+{{#if inputs.applyChangeSet}}
+The following Stack changes have been applied:
+{{else}}
+The following Stack changes will be applied:
+{{/if}}
+
+|     | ResourceType | LogicalResourceId | Action |
+| --- | :----------- | :---------------- | :----- |
+{{#each inputs.changes}}
+| {{#if ../inputs.applyChangeSet}}✅{{else}}⚠️{{/if}} | {{ResourceChange.ResourceType}} | {{ResourceChange.LogicalResourceId}} | {{ResourceChange.Action}} |
+{{/each}}
+{{else}}
+✔️ No Stack changes
+{{/if}}
+
+**Outputs**
+
+{{#if inputs.outputs.length}}
+| Key | Value | Description |
+| :---| :---- | :---------- |
+{{#each inputs.outputs}}
+| {{OutputKey}} | {{OutputValue}} | {{Description}} |
+{{/each}}
+{{else}}
+✔️ No Stack outputs
+{{/if}}
+
+`{{id}}`

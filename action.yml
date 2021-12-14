@@ -23,6 +23,11 @@ inputs:
   applyChangeSet:
     required: false
     description: 'Whether to show the ChangeSet as a Pull Request comment'
+outputs:
+  outputs:
+    description: 'JSON string array of CloudFormation outputs'
+  changes:
+    description: 'JSON string array of CloudFormation changes'
 runs:
   using: 'node16'
   main: 'dist/index.js'

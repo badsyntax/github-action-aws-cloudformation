@@ -38,6 +38,22 @@ jobs:
           awsRegion: 'us-east-1'
           parameters: 'S3BucketName=badsyntax-github-action-example-aws-cloudformation-us-east-1&S3AllowedOrigins=https://richardwillis.info'
 
+      - uses: badsyntax/github-action-issue-comment@v0.0.1
+        name: Comment on Pull Request
+        if: github.event_name == 'pull_request'
+        with:
+          action: 'create-clean'
+          template: '.github/pr-comment-template.hbs'
+          id: cloudformation
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issueNumber: ${{ github.event.pull_request.number }}
+          templateInputs: |
+            {
+              "changes": ${{ steps.update-stack.outputs.changes }},
+              "outputs": ${{ steps.update-stack.outputs.outputs }},
+              "applyChangeSet": ${{ github.event_name != 'repository_dispatch' }}
+            }
+
       - name: Deploy Website
         run: |
           # Now that the stack is created we can deploy our
