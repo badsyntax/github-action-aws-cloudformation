@@ -1,22 +1,17 @@
 import { getInput } from '@actions/core';
 
 export function getInputs() {
-  const stackName = getInput('stackName', {
+  const stackName = getInput('stack-name', {
     required: true,
     trimWhitespace: true,
   });
 
-  const region = getInput('awsRegion', {
+  const region = getInput('aws-region', {
     required: true,
     trimWhitespace: true,
   });
 
   const template = getInput('template', {
-    required: true,
-    trimWhitespace: true,
-  });
-
-  const gitHubToken = getInput('gitHubToken', {
     required: true,
     trimWhitespace: true,
   });
@@ -27,7 +22,7 @@ export function getInputs() {
   });
 
   const applyChangeSet =
-    getInput('applyChangeSet', {
+    getInput('apply-change-set', {
       required: true,
       trimWhitespace: true,
     }).toLowerCase() === 'true';
@@ -36,7 +31,6 @@ export function getInputs() {
     stackName,
     region,
     template,
-    gitHubToken,
     applyChangeSet,
     parameters,
   };
