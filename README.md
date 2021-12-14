@@ -56,11 +56,11 @@ jobs:
         if:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          stackName: 'example-cloudformation-stack'
+          stack-name: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
           # Only apply the changeset on pushes to main/release
-          applyChangeSet: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
-          awsRegion: 'us-east-1'
+          apply-change-set: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
+          aws-region: 'us-east-1'
           parameters: 'S3BucketName=example-bucket-us-east-1&S3AllowedOrigins=https://example.com'
 
       - name: Deploy Website
@@ -75,14 +75,14 @@ jobs:
 
 ## Action Inputs
 
-| key              | description                                                                                         | example                                         |
-| ---------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `stackName`      | The name of the Cloudformation stack to be created                                                  | `example-com-static-cloudformation-stack`       |
-| `template`       | The relative path to the CloudFormation stack template                                              | `./cloudformation/s3bucket_with_cloudfront.yml` |
-| `gitHubToken`    | GitHub Token used for commenting on Pull Requests                                                   | `${{ secrets.GITHUB_TOKEN }}`                   |
-| `awsRegion`      | The AWS region in which to create the stack                                                         | `us-east-1`                                     |
-| `parameters`     | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped | `Param1=foo&Param2=http://example.com`          |
-| `applyChangeSet` | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                               | `true`                                          |
+| key                | description                                                                                         | example                                         |
+| ------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `stack-name`       | The name of the Cloudformation stack to be created                                                  | `example-com-static-cloudformation-stack`       |
+| `template`         | The relative path to the CloudFormation stack template                                              | `./cloudformation/s3bucket_with_cloudfront.yml` |
+| `github-token`     | GitHub Token used for commenting on Pull Requests                                                   | `${{ secrets.GITHUB_TOKEN }}`                   |
+| `aws-region`       | The AWS region in which to create the stack                                                         | `us-east-1`                                     |
+| `parameters`       | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped | `Param1=foo&Param2=http://example.com`          |
+| `apply-change-set` | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                               | `true`                                          |
 
 ## Action Outputs
 
@@ -132,11 +132,11 @@ jobs:
         if:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          stackName: 'example-cloudformation-stack'
+          stack-name: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
           # Only apply the changeset on pushes to main/release
-          applyChangeSet: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
-          awsRegion: 'us-east-1'
+          apply-change-set: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
+          aws-region: 'us-east-1'
           parameters: 'S3BucketName=example-bucket-us-east-1&S3AllowedOrigins=https://example.com'
 
       - uses: badsyntax/github-action-issue-comment@master
@@ -167,11 +167,11 @@ jobs:
 
 ### ScreenShots
 
-Pull request created and `applyChangeSet` is `false`:
+Pull request created and `apply-change-set` is `false`:
 
 <img src="./images/changeset-changes-comment.png" style="max-width: 700px" alt="Pull Request Comment" />
 
-Pull request created and `applyChangeSet` is `true`:
+Pull request created and `apply-change-set` is `true`:
 
 <img src="./images/changeset-apply-comment.png" style="max-width: 700px" alt="Pull Request Comment" />
 

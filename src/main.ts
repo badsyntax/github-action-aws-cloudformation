@@ -40,7 +40,6 @@ export async function run(): Promise<void> {
     const result = await updateCloudFormationStack(
       cloudFormationClient,
       inputs.stackName,
-      inputs.gitHubToken,
       inputs.applyChangeSet,
       cfTemplateBody,
       cfParameters

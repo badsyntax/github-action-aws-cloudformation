@@ -32,10 +32,10 @@ jobs:
         id: update-stack
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          stackName: 'badsyntax-github-action-example-aws-cloudformation'
+          stack-name: 'badsyntax-github-action-example-aws-cloudformation'
           template: './cloudformation/s3bucket-example.yml'
-          applyChangeSet: ${{ github.event_name != 'repository_dispatch' }}
-          awsRegion: 'us-east-1'
+          apply-change-set: ${{ github.event_name != 'repository_dispatch' }}
+          aws-region: 'us-east-1'
           parameters: 'S3BucketName=badsyntax-github-action-example-aws-cloudformation-us-east-1&S3AllowedOrigins=https://richardwillis.info'
 
       - uses: badsyntax/github-action-issue-comment@v0.0.1

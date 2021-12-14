@@ -36,7 +36,6 @@
     "@aws-sdk/client-cloudformation": "^3.43.0"
   },
   "devDependencies": {
-    "@octokit/webhooks-definitions": "^3.67.3",
     "@types/node": "^16.11.11",
     "@typescript-eslint/parser": "^5.7.0",
     "@vercel/ncc": "^0.33.0",

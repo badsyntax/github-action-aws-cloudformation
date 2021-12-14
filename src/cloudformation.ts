@@ -338,7 +338,6 @@ type UpdateCloudFormationStackResponse = {
 export async function updateCloudFormationStack(
   client: CloudFormationClient,
   cfStackName: string,
-  gitHubToken: string,
   applyChangeSet: boolean,
   cfTemplateBody: string,
   cfParameters: Parameter[]

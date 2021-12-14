@@ -37257,7 +37257,7 @@ function getCloudFormationParameters(parametersQuery) {
     }
     return cfParams;
 }
-async function updateCloudFormationStack(client, cfStackName, gitHubToken, applyChangeSet, cfTemplateBody, cfParameters) {
+async function updateCloudFormationStack(client, cfStackName, applyChangeSet, cfTemplateBody, cfParameters) {
     await validateTemplate(client, cfTemplateBody);
     const changeSetType = await getChangeSetType(client, cfStackName, cfParameters);
     const changeSet = await createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, cfParameters);
@@ -37290,40 +37290,13 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, apply
 }
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var lib_github = __nccwpck_require__(5438);
+var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./lib/github.js
-var _a;
 
 
-const isPullRequest = lib_github.context.eventName === 'pull_request';
-const isPullRequestClosed = isPullRequest &&
-    lib_github.context.payload.action === 'closed';
-const prBranchName = (_a = lib_github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.ref;
-function generateCommentId(issue) {
-    return `AWS CloudFormation (ID:${issue.number})`;
-}
-async function maybeDeletePRComment(gitHubToken) {
-    const issue = github.context.issue;
-    const commentId = generateCommentId(issue);
-    const octokit = github.getOctokit(gitHubToken);
-    const comments = await octokit.rest.issues.listComments({
-        issue_number: issue.number,
-        owner: issue.owner,
-        repo: issue.repo,
-    });
-    const existingComment = comments.data.find((comment) => { var _a; return (_a = comment.body) === null || _a === void 0 ? void 0 : _a.startsWith(commentId); });
-    if (existingComment) {
-        await octokit.rest.issues.deleteComment({
-            issue_number: issue.number,
-            owner: issue.owner,
-            repo: issue.repo,
-            comment_id: existingComment.id,
-        });
-    }
-}
 function checkIsValidGitHubEvent() {
-    const action = lib_github.context.action;
-    switch (lib_github.context.eventName) {
+    const action = github.context.action;
+    switch (github.context.eventName) {
         case 'repository_dispatch':
         case 'workflow_dispatch':
         case 'push':
@@ -37331,7 +37304,7 @@ function checkIsValidGitHubEvent() {
         case 'pull_request':
             return ['opened', 'synchronize', 'reopened', 'closed'].includes(action);
     }
-    throw new Error(`Invalid GitHub event: ${lib_github.context.eventName}`);
+    throw new Error(`Invalid GitHub event: ${github.context.eventName}`);
 }
 function logOutputParameters(outputs) {
     outputs.forEach((output) => {
@@ -37348,11 +37321,11 @@ function logChanges(changes) {
 ;// CONCATENATED MODULE: ./lib/inputs.js
 
 function getInputs() {
-    const stackName = (0,core.getInput)('stackName', {
+    const stackName = (0,core.getInput)('stack-name', {
         required: true,
         trimWhitespace: true,
     });
-    const region = (0,core.getInput)('awsRegion', {
+    const region = (0,core.getInput)('aws-region', {
         required: true,
         trimWhitespace: true,
     });
@@ -37360,15 +37333,11 @@ function getInputs() {
         required: true,
         trimWhitespace: true,
     });
-    const gitHubToken = (0,core.getInput)('gitHubToken', {
-        required: true,
-        trimWhitespace: true,
-    });
     const parameters = (0,core.getInput)('parameters', {
         required: true,
         trimWhitespace: true,
     });
-    const applyChangeSet = (0,core.getInput)('applyChangeSet', {
+    const applyChangeSet = (0,core.getInput)('apply-change-set', {
         required: true,
         trimWhitespace: true,
     }).toLowerCase() === 'true';
@@ -37376,7 +37345,6 @@ function getInputs() {
         stackName,
         region,
         template,
-        gitHubToken,
         applyChangeSet,
         parameters,
     };
@@ -37402,7 +37370,7 @@ async function run() {
         });
         const cfParameters = getCloudFormationParameters(inputs.parameters);
         (0,core.debug)(`CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`);
-        const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.applyChangeSet, cfTemplateBody, cfParameters);
+        const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.applyChangeSet, cfTemplateBody, cfParameters);
         logOutputParameters(((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) || []);
         logChanges(result.changes);
     }
