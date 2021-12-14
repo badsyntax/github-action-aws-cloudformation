@@ -79,7 +79,6 @@ jobs:
 | ------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | `stack-name`       | The name of the Cloudformation stack to be created                                                  | `example-com-static-cloudformation-stack`       |
 | `template`         | The relative path to the CloudFormation stack template                                              | `./cloudformation/s3bucket_with_cloudfront.yml` |
-| `github-token`     | GitHub Token used for commenting on Pull Requests                                                   | `${{ secrets.GITHUB_TOKEN }}`                   |
 | `aws-region`       | The AWS region in which to create the stack                                                         | `us-east-1`                                     |
 | `parameters`       | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped | `Param1=foo&Param2=http://example.com`          |
 | `apply-change-set` | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                               | `true`                                          |
