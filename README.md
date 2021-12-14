@@ -52,10 +52,9 @@ jobs:
 
       - name: Update CloudFormation Stack
         id: update-stack
-        uses: badsyntax/github-action-aws-cloudformation@v0.0.1
+        uses: badsyntax/github-action-aws-cloudformation@master
         if:
         with:
-          # No need to create this token. Use the default token.
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           stackName: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
@@ -87,11 +86,86 @@ jobs:
 
 ## Action Outputs
 
-| Name              | Description                                                                                                                                             | Example                                           |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `[cf-output-key]` | Outputs correspond to the CloudFormation outputs. For example if you've set an output to be `S3BucketName` then this key will exist as an Action output | `anything, depending on the CF output definition` |
+| Name              | Description                                                                                                                                             | Example                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `[cf-output-key]` | Outputs correspond to the CloudFormation outputs. For example if you've set an output to be `S3BucketName` then this key will exist as an Action output | `anything, depending on the CF output definition`                                        |
+| `outputs`         | JSON string array of CloudFormation outputs                                                                                                             | `[{"OutputKey":"S3BucketName","OutputValue":"bucket-name","Description":"Bucket name"}]` |
+| `changes`         | JSON string array of CloudFormation changes                                                                                                             | `[{"OutputKey":"S3BucketName","OutputValue":"bucket-name","Description":"Bucket name"}]` |
 
-## ChangeSet ScreenShots
+## Pull Request Comments
+
+First you need to define the comment template. Download [pr-comment-template.hbs](https://github.com/badsyntax/github-action-aws-cloudformation/blob/master/.github/pr-comment-template.hbs) to your repo and update as appropriate.
+
+Next add the [badsyntax/github-action-issue-comment](https://github.com/badsyntax/github-action-issue-comment) action to create Pull Request comments with an overview of the CloudFormation changes and outputs.
+
+```yaml
+name: 'deploy'
+
+concurrency:
+  group: prod_deploy
+  cancel-in-progress: false
+
+on:
+  repository_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  deploy-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Update CloudFormation Stack
+        id: update-stack
+        uses: badsyntax/github-action-aws-cloudformation@master
+        if:
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          stackName: 'example-cloudformation-stack'
+          template: './cloudformation/s3bucket-example.yml'
+          # Only apply the changeset on pushes to main/release
+          applyChangeSet: ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
+          awsRegion: 'us-east-1'
+          parameters: 'S3BucketName=example-bucket-us-east-1&S3AllowedOrigins=https://example.com'
+
+      - uses: badsyntax/github-action-issue-comment@master
+        name: Comment on Pull Request
+        if: github.event_name == 'pull_request'
+        with:
+          action: 'create-clean'
+          template: '.github/pr-comment-template.hbs'
+          id: cloudformation
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issueNumber: ${{ github.event.pull_request.number }}
+          templateInputs: |
+            {
+              "changes": ${{ steps.update-stack.outputs.changes }},
+              "outputs": ${{ steps.update-stack.outputs.outputs }},
+              "applyChangeSet": ${{ github.event_name != 'pull_request' && github.event_name != 'repository_dispatch' }}
+            }
+
+      - name: Deploy Website
+        run: |
+          # Now that the stack is created we can deploy our
+          # website to the S3 bucket.
+          echo "Deploy to S3 Bucket: $S3BucketName"
+        env:
+          # Use outputs from the CloudFormation Stack
+          S3BucketName: ${{ steps.update-stack.outputs.S3BucketName }}
+```
+
+### ScreenShots
 
 Pull request created and `applyChangeSet` is `false`:
 
@@ -107,8 +181,10 @@ No stack changes:
 
 ## Related Projects
 
-- [github-action-aws-cloudfront](https://github.com/badsyntax/github-action-aws-cloudfront)
-- [github-action-aws-s3](https://github.com/badsyntax/github-action-aws-s3)
+- [badsyntax/github-action-aws-cloudfront](https://github.com/badsyntax/github-action-aws-cloudfront)
+- [badsyntax/github-action-aws-s3](https://github.com/badsyntax/github-action-aws-s3)
+- [badsyntax/github-action-issue-comment](https://github.com/badsyntax/github-action-issue-comment)
+- [badsyntax/github-action-render-template](https://github.com/badsyntax/github-action-render-template)
 
 ## Debugging
 

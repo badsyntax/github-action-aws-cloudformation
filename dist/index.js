@@ -36182,7 +36182,7 @@ var _version = _interopRequireDefault(__nccwpck_require__(2414));
 
 var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
 var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
@@ -36357,7 +36357,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 2981:
+/***/ 8950:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
@@ -36414,7 +36414,7 @@ exports["default"] = void 0;
 
 var _rng = _interopRequireDefault(__nccwpck_require__(807));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36548,7 +36548,7 @@ Object.defineProperty(exports, "__esModule", ({
 exports["default"] = _default;
 exports.URL = exports.DNS = void 0;
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
 var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
@@ -36633,7 +36633,7 @@ exports["default"] = void 0;
 
 var _rng = _interopRequireDefault(__nccwpck_require__(807));
 
-var _stringify = _interopRequireDefault(__nccwpck_require__(2981));
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37056,503 +37056,6 @@ var dist_cjs = __nccwpck_require__(5650);
 ;// CONCATENATED MODULE: ./lib/constants.js
 const defaultDelayMs = 5000;
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
-;// CONCATENATED MODULE: ./node_modules/markdown-table/index.js
-/**
- * @typedef Options
- *   Configuration (optional).
- * @property {string|null|Array<string|null|undefined>} [align]
- *   One style for all columns, or styles for their respective columns.
- *   Each style is either `'l'` (left), `'r'` (right), or `'c'` (center).
- *   Other values are treated as `''`, which doesn’t place the colon in the
- *   alignment row but does align left.
- *   *Only the lowercased first character is used, so `Right` is fine.*
- * @property {boolean} [padding=true]
- *   Whether to add a space of padding between delimiters and cells.
- *
- *   When `true`, there is padding:
- *
- *   ```markdown
- *   | Alpha | B     |
- *   | ----- | ----- |
- *   | C     | Delta |
- *   ```
- *
- *   When `false`, there is no padding:
- *
- *   ```markdown
- *   |Alpha|B    |
- *   |-----|-----|
- *   |C    |Delta|
- *   ```
- * @property {boolean} [delimiterStart=true]
- *   Whether to begin each row with the delimiter.
- *
- *   > 👉 **Note**: please don’t use this: it could create fragile structures
- *   > that aren’t understandable to some markdown parsers.
- *
- *   When `true`, there are starting delimiters:
- *
- *   ```markdown
- *   | Alpha | B     |
- *   | ----- | ----- |
- *   | C     | Delta |
- *   ```
- *
- *   When `false`, there are no starting delimiters:
- *
- *   ```markdown
- *   Alpha | B     |
- *   ----- | ----- |
- *   C     | Delta |
- *   ```
- * @property {boolean} [delimiterEnd=true]
- *   Whether to end each row with the delimiter.
- *
- *   > 👉 **Note**: please don’t use this: it could create fragile structures
- *   > that aren’t understandable to some markdown parsers.
- *
- *   When `true`, there are ending delimiters:
- *
- *   ```markdown
- *   | Alpha | B     |
- *   | ----- | ----- |
- *   | C     | Delta |
- *   ```
- *
- *   When `false`, there are no ending delimiters:
- *
- *   ```markdown
- *   | Alpha | B
- *   | ----- | -----
- *   | C     | Delta
- *   ```
- * @property {boolean} [alignDelimiters=true]
- *   Whether to align the delimiters.
- *   By default, they are aligned:
- *
- *   ```markdown
- *   | Alpha | B     |
- *   | ----- | ----- |
- *   | C     | Delta |
- *   ```
- *
- *   Pass `false` to make them staggered:
- *
- *   ```markdown
- *   | Alpha | B |
- *   | - | - |
- *   | C | Delta |
- *   ```
- * @property {(value: string) => number} [stringLength]
- *   Function to detect the length of table cell content.
- *   This is used when aligning the delimiters (`|`) between table cells.
- *   Full-width characters and emoji mess up delimiter alignment when viewing
- *   the markdown source.
- *   To fix this, you can pass this function, which receives the cell content
- *   and returns its “visible” size.
- *   Note that what is and isn’t visible depends on where the text is displayed.
- *
- *   Without such a function, the following:
- *
- *   ```js
- *   markdownTable([
- *     ['Alpha', 'Bravo'],
- *     ['中文', 'Charlie'],
- *     ['👩‍❤️‍👩', 'Delta']
- *   ])
- *   ```
- *
- *   Yields:
- *
- *   ```markdown
- *   | Alpha | Bravo |
- *   | - | - |
- *   | 中文 | Charlie |
- *   | 👩‍❤️‍👩 | Delta |
- *   ```
- *
- *   With [`string-width`](https://github.com/sindresorhus/string-width):
- *
- *   ```js
- *   import stringWidth from 'string-width'
- *
- *   markdownTable(
- *     [
- *       ['Alpha', 'Bravo'],
- *       ['中文', 'Charlie'],
- *       ['👩‍❤️‍👩', 'Delta']
- *     ],
- *     {stringLength: stringWidth}
- *   )
- *   ```
- *
- *   Yields:
- *
- *   ```markdown
- *   | Alpha | Bravo   |
- *   | ----- | ------- |
- *   | 中文  | Charlie |
- *   | 👩‍❤️‍👩    | Delta   |
- *   ```
- */
-
-/**
- * @typedef {Options} MarkdownTableOptions
- * @todo
- *   Remove next major.
- */
-
-/**
- * Generate a markdown ([GFM](https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables)) table..
- *
- * @param {Array<Array<string|null|undefined>>} table
- *   Table data (matrix of strings).
- * @param {Options} [options]
- *   Configuration (optional).
- * @returns {string}
- */
-function markdownTable(table, options = {}) {
-  const align = (options.align || []).concat()
-  const stringLength = options.stringLength || defaultStringLength
-  /** @type {Array<number>} Character codes as symbols for alignment per column. */
-  const alignments = []
-  /** @type {Array<Array<string>>} Cells per row. */
-  const cellMatrix = []
-  /** @type {Array<Array<number>>} Sizes of each cell per row. */
-  const sizeMatrix = []
-  /** @type {Array<number>} */
-  const longestCellByColumn = []
-  let mostCellsPerRow = 0
-  let rowIndex = -1
-
-  // This is a superfluous loop if we don’t align delimiters, but otherwise we’d
-  // do superfluous work when aligning, so optimize for aligning.
-  while (++rowIndex < table.length) {
-    /** @type {Array<string>} */
-    const row = []
-    /** @type {Array<number>} */
-    const sizes = []
-    let columnIndex = -1
-
-    if (table[rowIndex].length > mostCellsPerRow) {
-      mostCellsPerRow = table[rowIndex].length
-    }
-
-    while (++columnIndex < table[rowIndex].length) {
-      const cell = serialize(table[rowIndex][columnIndex])
-
-      if (options.alignDelimiters !== false) {
-        const size = stringLength(cell)
-        sizes[columnIndex] = size
-
-        if (
-          longestCellByColumn[columnIndex] === undefined ||
-          size > longestCellByColumn[columnIndex]
-        ) {
-          longestCellByColumn[columnIndex] = size
-        }
-      }
-
-      row.push(cell)
-    }
-
-    cellMatrix[rowIndex] = row
-    sizeMatrix[rowIndex] = sizes
-  }
-
-  // Figure out which alignments to use.
-  let columnIndex = -1
-
-  if (typeof align === 'object' && 'length' in align) {
-    while (++columnIndex < mostCellsPerRow) {
-      alignments[columnIndex] = toAlignment(align[columnIndex])
-    }
-  } else {
-    const code = toAlignment(align)
-
-    while (++columnIndex < mostCellsPerRow) {
-      alignments[columnIndex] = code
-    }
-  }
-
-  // Inject the alignment row.
-  columnIndex = -1
-  /** @type {Array<string>} */
-  const row = []
-  /** @type {Array<number>} */
-  const sizes = []
-
-  while (++columnIndex < mostCellsPerRow) {
-    const code = alignments[columnIndex]
-    let before = ''
-    let after = ''
-
-    if (code === 99 /* `c` */) {
-      before = ':'
-      after = ':'
-    } else if (code === 108 /* `l` */) {
-      before = ':'
-    } else if (code === 114 /* `r` */) {
-      after = ':'
-    }
-
-    // There *must* be at least one hyphen-minus in each alignment cell.
-    let size =
-      options.alignDelimiters === false
-        ? 1
-        : Math.max(
-            1,
-            longestCellByColumn[columnIndex] - before.length - after.length
-          )
-
-    const cell = before + '-'.repeat(size) + after
-
-    if (options.alignDelimiters !== false) {
-      size = before.length + size + after.length
-
-      if (size > longestCellByColumn[columnIndex]) {
-        longestCellByColumn[columnIndex] = size
-      }
-
-      sizes[columnIndex] = size
-    }
-
-    row[columnIndex] = cell
-  }
-
-  // Inject the alignment row.
-  cellMatrix.splice(1, 0, row)
-  sizeMatrix.splice(1, 0, sizes)
-
-  rowIndex = -1
-  /** @type {Array<string>} */
-  const lines = []
-
-  while (++rowIndex < cellMatrix.length) {
-    const row = cellMatrix[rowIndex]
-    const sizes = sizeMatrix[rowIndex]
-    columnIndex = -1
-    /** @type {Array<string>} */
-    const line = []
-
-    while (++columnIndex < mostCellsPerRow) {
-      const cell = row[columnIndex] || ''
-      let before = ''
-      let after = ''
-
-      if (options.alignDelimiters !== false) {
-        const size =
-          longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0)
-        const code = alignments[columnIndex]
-
-        if (code === 114 /* `r` */) {
-          before = ' '.repeat(size)
-        } else if (code === 99 /* `c` */) {
-          if (size % 2) {
-            before = ' '.repeat(size / 2 + 0.5)
-            after = ' '.repeat(size / 2 - 0.5)
-          } else {
-            before = ' '.repeat(size / 2)
-            after = before
-          }
-        } else {
-          after = ' '.repeat(size)
-        }
-      }
-
-      if (options.delimiterStart !== false && !columnIndex) {
-        line.push('|')
-      }
-
-      if (
-        options.padding !== false &&
-        // Don’t add the opening space if we’re not aligning and the cell is
-        // empty: there will be a closing space.
-        !(options.alignDelimiters === false && cell === '') &&
-        (options.delimiterStart !== false || columnIndex)
-      ) {
-        line.push(' ')
-      }
-
-      if (options.alignDelimiters !== false) {
-        line.push(before)
-      }
-
-      line.push(cell)
-
-      if (options.alignDelimiters !== false) {
-        line.push(after)
-      }
-
-      if (options.padding !== false) {
-        line.push(' ')
-      }
-
-      if (
-        options.delimiterEnd !== false ||
-        columnIndex !== mostCellsPerRow - 1
-      ) {
-        line.push('|')
-      }
-    }
-
-    lines.push(
-      options.delimiterEnd === false
-        ? line.join('').replace(/ +$/, '')
-        : line.join('')
-    )
-  }
-
-  return lines.join('\n')
-}
-
-/**
- * @param {string|null|undefined} [value]
- * @returns {string}
- */
-function serialize(value) {
-  return value === null || value === undefined ? '' : String(value)
-}
-
-/**
- * @param {string} value
- * @returns {number}
- */
-function defaultStringLength(value) {
-  return value.length
-}
-
-/**
- * @param {string|null|undefined} value
- * @returns {number}
- */
-function toAlignment(value) {
-  const code = typeof value === 'string' ? value.codePointAt(0) : 0
-
-  return code === 67 /* `C` */ || code === 99 /* `c` */
-    ? 99 /* `c` */
-    : code === 76 /* `L` */ || code === 108 /* `l` */
-    ? 108 /* `l` */
-    : code === 82 /* `R` */ || code === 114 /* `r` */
-    ? 114 /* `r` */
-    : 0
-}
-
-;// CONCATENATED MODULE: ./lib/github.js
-var _a;
-
-
-
-const isPullRequest = github.context.eventName === 'pull_request';
-const isPullRequestClosed = isPullRequest &&
-    github.context.payload.action === 'closed';
-const prBranchName = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.ref;
-function getChangeSetTable(changes, applyChangeSet) {
-    if (!changes.length) {
-        return '';
-    }
-    const headings = [['', 'ResourceType', 'LogicalResourceId', 'Action']];
-    const rows = changes.map((change) => {
-        var _a, _b, _c;
-        return [
-            applyChangeSet ? '✅' : '⚠️',
-            String((_a = change.ResourceChange) === null || _a === void 0 ? void 0 : _a.ResourceType),
-            String((_b = change.ResourceChange) === null || _b === void 0 ? void 0 : _b.LogicalResourceId),
-            String((_c = change.ResourceChange) === null || _c === void 0 ? void 0 : _c.Action),
-        ];
-    });
-    return markdownTable(headings.concat(rows), {
-        align: headings[0].map(() => 'l'),
-    });
-}
-function getOutputsTable(stack) {
-    const outputs = stack.Outputs || [];
-    if (!outputs.length) {
-        return '';
-    }
-    const headings = [['Key', 'Value', 'Description']];
-    const rows = outputs.map((output) => [
-        output.OutputKey || '',
-        output.OutputValue || '',
-        output.Description || '',
-    ]);
-    return markdownTable(headings.concat(rows), {
-        align: headings[0].map(() => 'l'),
-    });
-}
-function getStackChangesMessage(changeSetTable, applyChangeSet) {
-    return `**ChangeSet**\n\n${changeSetTable
-        ? `${applyChangeSet
-            ? 'The following Stack changes have been applied:\n\n'
-            : 'The following Stack changes will be applied:\n\n'}${changeSetTable}`
-        : '✔️ No Stack changes'}`;
-}
-function getStackOutputsMessage(outputsTable) {
-    return outputsTable ? `**Outputs**\n\n${outputsTable}` : '';
-}
-function getCommentMarkdown(changeSetTable, outputsTable, applyChangeSet) {
-    const changesMessage = getStackChangesMessage(changeSetTable, applyChangeSet);
-    const outputsMessage = getStackOutputsMessage(outputsTable);
-    return `${changesMessage}${outputsMessage ? '\n\n' : ''}${outputsMessage}`;
-}
-function generateCommentId(issue) {
-    return `AWS CloudFormation (ID:${issue.number})`;
-}
-async function maybeDeletePRComment(gitHubToken) {
-    const issue = github.context.issue;
-    const commentId = generateCommentId(issue);
-    const octokit = github.getOctokit(gitHubToken);
-    const comments = await octokit.rest.issues.listComments({
-        issue_number: issue.number,
-        owner: issue.owner,
-        repo: issue.repo,
-    });
-    const existingComment = comments.data.find((comment) => { var _a; return (_a = comment.body) === null || _a === void 0 ? void 0 : _a.startsWith(commentId); });
-    if (existingComment) {
-        await octokit.rest.issues.deleteComment({
-            issue_number: issue.number,
-            owner: issue.owner,
-            repo: issue.repo,
-            comment_id: existingComment.id,
-        });
-    }
-}
-async function addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, stack) {
-    await maybeDeletePRComment(gitHubToken);
-    const changeSetTable = getChangeSetTable(changes, applyChangeSet);
-    const outputsTable = stack ? getOutputsTable(stack) : '';
-    const markdown = getCommentMarkdown(changeSetTable, outputsTable, applyChangeSet);
-    const issue = github.context.issue;
-    const commentId = generateCommentId(issue);
-    const body = `${commentId}\n\n${markdown}`;
-    const octokit = github.getOctokit(gitHubToken);
-    await octokit.rest.issues.createComment({
-        issue_number: issue.number,
-        body: body,
-        owner: issue.owner,
-        repo: issue.repo,
-    });
-}
-function checkIsValidGitHubEvent() {
-    const action = github.context.action;
-    switch (github.context.eventName) {
-        case 'repository_dispatch':
-        case 'workflow_dispatch':
-        case 'push':
-            return true;
-        case 'pull_request':
-            return ['opened', 'synchronize', 'reopened', 'closed'].includes(action);
-    }
-    throw new Error(`Invalid GitHub event: ${github.context.eventName}`);
-}
-function logOutputParameters(outputs) {
-    outputs.forEach((output) => {
-        (0,core.info)(`::set-output name=${output.OutputKey}::${output.OutputValue}`);
-    });
-}
-
 ;// CONCATENATED MODULE: ./lib/util.js
 function delay(delayMs) {
     return new Promise((resolve) => {
@@ -37561,7 +37064,6 @@ function delay(delayMs) {
 }
 
 ;// CONCATENATED MODULE: ./lib/cloudformation.js
-
 
 
 
@@ -37780,14 +37282,67 @@ async function updateCloudFormationStack(client, cfStackName, gitHubToken, apply
         else {
             stack = await describeStack(client, cfStackName);
         }
-        if (isPullRequest && !isPullRequestClosed) {
-            await addPRCommentWithChangeSet(changes, gitHubToken, applyChangeSet, stack);
-        }
     }
     return {
         changes,
         stack,
     };
+}
+
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var lib_github = __nccwpck_require__(5438);
+;// CONCATENATED MODULE: ./lib/github.js
+var _a;
+
+
+const isPullRequest = lib_github.context.eventName === 'pull_request';
+const isPullRequestClosed = isPullRequest &&
+    lib_github.context.payload.action === 'closed';
+const prBranchName = (_a = lib_github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.head.ref;
+function generateCommentId(issue) {
+    return `AWS CloudFormation (ID:${issue.number})`;
+}
+async function maybeDeletePRComment(gitHubToken) {
+    const issue = github.context.issue;
+    const commentId = generateCommentId(issue);
+    const octokit = github.getOctokit(gitHubToken);
+    const comments = await octokit.rest.issues.listComments({
+        issue_number: issue.number,
+        owner: issue.owner,
+        repo: issue.repo,
+    });
+    const existingComment = comments.data.find((comment) => { var _a; return (_a = comment.body) === null || _a === void 0 ? void 0 : _a.startsWith(commentId); });
+    if (existingComment) {
+        await octokit.rest.issues.deleteComment({
+            issue_number: issue.number,
+            owner: issue.owner,
+            repo: issue.repo,
+            comment_id: existingComment.id,
+        });
+    }
+}
+function checkIsValidGitHubEvent() {
+    const action = lib_github.context.action;
+    switch (lib_github.context.eventName) {
+        case 'repository_dispatch':
+        case 'workflow_dispatch':
+        case 'push':
+            return true;
+        case 'pull_request':
+            return ['opened', 'synchronize', 'reopened', 'closed'].includes(action);
+    }
+    throw new Error(`Invalid GitHub event: ${lib_github.context.eventName}`);
+}
+function logOutputParameters(outputs) {
+    outputs.forEach((output) => {
+        if (output.OutputKey) {
+            (0,core.setOutput)(output.OutputKey, output.OutputValue);
+        }
+    });
+    (0,core.setOutput)('outputs', JSON.stringify(outputs));
+}
+function logChanges(changes) {
+    (0,core.setOutput)('changes', JSON.stringify(changes));
 }
 
 ;// CONCATENATED MODULE: ./lib/inputs.js
@@ -37848,9 +37403,8 @@ async function run() {
         const cfParameters = getCloudFormationParameters(inputs.parameters);
         (0,core.debug)(`CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`);
         const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.gitHubToken, inputs.applyChangeSet, cfTemplateBody, cfParameters);
-        if ((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) {
-            logOutputParameters(result.stack.Outputs);
-        }
+        logOutputParameters(((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) || []);
+        logChanges(result.changes);
     }
     catch (error) {
         if (error instanceof Error) {

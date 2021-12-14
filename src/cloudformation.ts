@@ -22,11 +22,6 @@ import {
 } from '@aws-sdk/client-cloudformation';
 
 import { defaultDelayMs } from './constants.js';
-import {
-  addPRCommentWithChangeSet,
-  isPullRequest,
-  isPullRequestClosed,
-} from './github.js';
 import { delay } from './util.js';
 
 let rollbackDetected = false;
@@ -384,15 +379,6 @@ export async function updateCloudFormationStack(
       throw new Error('Rollback detected, stack creation failed');
     } else {
       stack = await describeStack(client, cfStackName);
-    }
-
-    if (isPullRequest && !isPullRequestClosed) {
-      await addPRCommentWithChangeSet(
-        changes,
-        gitHubToken,
-        applyChangeSet,
-        stack
-      );
     }
   }
 

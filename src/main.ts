@@ -7,7 +7,11 @@ import {
   getCloudFormationParameters,
   updateCloudFormationStack,
 } from './cloudformation.js';
-import { checkIsValidGitHubEvent, logOutputParameters } from './github.js';
+import {
+  checkIsValidGitHubEvent,
+  logChanges,
+  logOutputParameters,
+} from './github.js';
 import { getInputs } from './inputs.js';
 
 export async function run(): Promise<void> {
@@ -42,9 +46,8 @@ export async function run(): Promise<void> {
       cfParameters
     );
 
-    if (result.stack?.Outputs) {
-      logOutputParameters(result.stack.Outputs);
-    }
+    logOutputParameters(result.stack?.Outputs || []);
+    logChanges(result.changes);
   } catch (error) {
     if (error instanceof Error) {
       setFailed(error.message);
