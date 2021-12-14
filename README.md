@@ -16,7 +16,7 @@ This Action is actively maintained and includes additional features.
 
 - Apply or Preview ChangeSet with Pull Request comments
 - Log intervals to show constant feedback
-- CloudFormation outputs set as Action Outputs which can be used in subsequent steps
+- CloudFormation outputs set as Action Outputs (which can be used in subsequent steps)
 
 ## Getting Started
 
@@ -85,6 +85,12 @@ jobs:
 | `parameters`     | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped | `Param1=foo&Param2=http://example.com`          |
 | `applyChangeSet` | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                               | `true`                                          |
 
+## Action Outputs
+
+| Name              | Description                                                                                                                                             | Example                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `[cf-output-key]` | Outputs correspond to the CloudFormation outputs. For example if you've set an output to be `S3BucketName` then this key will exist as an Action output | `anything, depending on the CF output definition` |
+
 ## ChangeSet ScreenShots
 
 Pull request created and `applyChangeSet` is `false`:
@@ -109,6 +115,11 @@ No stack changes:
 Check the Action output for logs.
 
 If you need to see more verbose logs you can set `ACTIONS_STEP_DEBUG` to `true` as an Action Secret.
+
+## Support
+
+- 👉 [Submit a bug report](https://github.com/badsyntax/github-action-aws-cloudformation/issues/new?assignees=badsyntax&labels=bug&template=bug_report.md&title=)
+- 👉 [Submit a feature request](https://github.com/badsyntax/github-action-aws-cloudformation/issues/new?assignees=badsyntax&labels=enhancement&template=feature_request.md&title=)
 
 ## License
 
