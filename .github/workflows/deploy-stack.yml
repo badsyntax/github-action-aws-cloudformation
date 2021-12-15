@@ -37,7 +37,7 @@ jobs:
           aws-region: 'us-east-1'
           parameters: 'S3BucketName=badsyntax-github-action-example-aws-cloudformation-us-east-1&S3AllowedOrigins=https://richardwillis.info'
 
-      - uses: badsyntax/github-action-issue-comment@v0.0.1
+      - uses: badsyntax/github-action-issue-comment@v0.0.4
         name: Comment on Pull Request
         if: github.event_name == 'pull_request'
         with:
