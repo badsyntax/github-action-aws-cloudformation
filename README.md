@@ -144,8 +144,8 @@ jobs:
           template: '.github/pr-comment-template.hbs'
           id: cloudformation
           token: ${{ secrets.GITHUB_TOKEN }}
-          issueNumber: ${{ github.event.pull_request.number }}
-          templateInputs: |
+          issue-number: ${{ github.event.pull_request.number }}
+          template-inputs: |
             {
               "changes": ${{ steps.update-stack.outputs.changes }},
               "outputs": ${{ steps.update-stack.outputs.outputs }},
