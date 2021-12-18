@@ -27,11 +27,15 @@ import { delay } from './util.js';
 let rollbackDetected = false;
 
 function logStackStatus(status: StackStatus): void {
-  if (status === StackStatus.ROLLBACK_IN_PROGRESS && !rollbackDetected) {
+  if (
+    (status === StackStatus.ROLLBACK_IN_PROGRESS ||
+      status === StackStatus.UPDATE_ROLLBACK_IN_PROGRESS) &&
+    !rollbackDetected
+  ) {
     rollbackDetected = true;
     warning(
-      `${StackStatus.ROLLBACK_IN_PROGRESS} detected! **Check the CloudFormation events in the AWS Console for more information.** ` +
-        `${StackStatus.ROLLBACK_IN_PROGRESS} can take a while to complete. ` +
+      `${status} detected! **Check the CloudFormation events in the AWS Console for more information.** ` +
+        `${status} can take a while to complete. ` +
         `You can manually delete the CloudFormation stack in the AWS Console or just wait until this process completes...`
     );
   }

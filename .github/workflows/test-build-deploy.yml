@@ -1,4 +1,4 @@
-name: 'Update Stack'
+name: 'Build, Test & Deploy'
 
 concurrency:
   group: prod_deploy
@@ -14,12 +14,42 @@ on:
       - master
 
 jobs:
+  test:
+    name: 'Build & Test'
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Node.js 16.x
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run all
+        run: |
+          npm run lint
+          npm run format-check
+          npm test
+          npm run build
+          npm run package
+      - name: Compare the expected and actual dist/ directories
+        run: |
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+            echo "Detected uncommitted changes after build.  See status below:"
+            git diff
+            exit 1
+          fi
   deploy:
     name: 'Deploy'
+    needs: test
     runs-on: ubuntu-20.04
     if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - uses: actions/checkout@v2
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -45,8 +75,8 @@ jobs:
           template: '.github/pr-comment-template.hbs'
           id: cloudformation
           token: ${{ secrets.GITHUB_TOKEN }}
-          issueNumber: ${{ github.event.pull_request.number }}
-          templateInputs: |
+          issue-number: ${{ github.event.pull_request.number }}
+          template-inputs: |
             {
               "changes": ${{ steps.update-stack.outputs.changes }},
               "outputs": ${{ steps.update-stack.outputs.outputs }},
