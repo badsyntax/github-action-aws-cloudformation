@@ -33,7 +33,7 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
-    "@aws-sdk/client-cloudformation": "^3.43.0"
+    "@aws-sdk/client-cloudformation": "^3.45.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.0",
