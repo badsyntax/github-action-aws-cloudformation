@@ -17,7 +17,7 @@ export function getInputs() {
   });
 
   const parameters = getInput('parameters', {
-    required: true,
+    required: false,
     trimWhitespace: true,
   });
 
