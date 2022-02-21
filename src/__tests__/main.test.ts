@@ -18,4 +18,9 @@ describe('getCloudFormationParameters', () => {
       },
     ]);
   });
+
+  it('should allow empty parameters', () => {
+    const params = getCloudFormationParameters();
+    expect(params).toEqual([]);
+  });
 });

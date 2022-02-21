@@ -321,8 +321,11 @@ async function validateTemplate(
 }
 
 export function getCloudFormationParameters(
-  parametersQuery: string
+  parametersQuery?: string
 ): Parameter[] {
+  if (!parametersQuery) {
+    return [];
+  }
   const params = new URLSearchParams(parametersQuery);
   const cfParams: Parameter[] = [];
   for (const key of params.keys()) {

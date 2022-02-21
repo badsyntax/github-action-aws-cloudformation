@@ -37249,6 +37249,9 @@ async function validateTemplate(client, templateBody) {
 }
 function getCloudFormationParameters(parametersQuery) {
     var _a;
+    if (!parametersQuery) {
+        return [];
+    }
     const params = new URLSearchParams(parametersQuery);
     const cfParams = [];
     for (const key of params.keys()) {
@@ -37336,7 +37339,7 @@ function getInputs() {
         trimWhitespace: true,
     });
     const parameters = (0,core.getInput)('parameters', {
-        required: true,
+        required: false,
         trimWhitespace: true,
     });
     const applyChangeSet = (0,core.getInput)('apply-change-set', {
