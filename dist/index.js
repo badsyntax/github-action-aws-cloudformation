@@ -1501,6 +1501,7 @@ const DeleteStackSetCommand_1 = __nccwpck_require__(589);
 const DeregisterTypeCommand_1 = __nccwpck_require__(5931);
 const DescribeAccountLimitsCommand_1 = __nccwpck_require__(664);
 const DescribeChangeSetCommand_1 = __nccwpck_require__(4895);
+const DescribeChangeSetHooksCommand_1 = __nccwpck_require__(6824);
 const DescribePublisherCommand_1 = __nccwpck_require__(7761);
 const DescribeStackDriftDetectionStatusCommand_1 = __nccwpck_require__(3680);
 const DescribeStackEventsCommand_1 = __nccwpck_require__(7929);
@@ -1763,6 +1764,20 @@ class CloudFormation extends CloudFormationClient_1.CloudFormationClient {
     }
     describeChangeSet(args, optionsOrCb, cb) {
         const command = new DescribeChangeSetCommand_1.DescribeChangeSetCommand(args);
+        if (typeof optionsOrCb === "function") {
+            this.send(command, optionsOrCb);
+        }
+        else if (typeof cb === "function") {
+            if (typeof optionsOrCb !== "object")
+                throw new Error(`Expect http options but get ${typeof optionsOrCb}`);
+            this.send(command, optionsOrCb || {}, cb);
+        }
+        else {
+            return this.send(command, optionsOrCb);
+        }
+    }
+    describeChangeSetHooks(args, optionsOrCb, cb) {
+        const command = new DescribeChangeSetHooksCommand_1.DescribeChangeSetHooksCommand(args);
         if (typeof optionsOrCb === "function") {
             this.send(command, optionsOrCb);
         }
@@ -3193,6 +3208,49 @@ class DescribeChangeSetCommand extends smithy_client_1.Command {
     }
 }
 exports.DescribeChangeSetCommand = DescribeChangeSetCommand;
+
+
+/***/ }),
+
+/***/ 6824:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DescribeChangeSetHooksCommand = void 0;
+const middleware_serde_1 = __nccwpck_require__(3631);
+const smithy_client_1 = __nccwpck_require__(4963);
+const models_0_1 = __nccwpck_require__(5378);
+const Aws_query_1 = __nccwpck_require__(6110);
+class DescribeChangeSetHooksCommand extends smithy_client_1.Command {
+    constructor(input) {
+        super();
+        this.input = input;
+    }
+    resolveMiddleware(clientStack, configuration, options) {
+        this.middlewareStack.use(middleware_serde_1.getSerdePlugin(configuration, this.serialize, this.deserialize));
+        const stack = clientStack.concat(this.middlewareStack);
+        const { logger } = configuration;
+        const clientName = "CloudFormationClient";
+        const commandName = "DescribeChangeSetHooksCommand";
+        const handlerExecutionContext = {
+            logger,
+            clientName,
+            commandName,
+            inputFilterSensitiveLog: models_0_1.DescribeChangeSetHooksInput.filterSensitiveLog,
+            outputFilterSensitiveLog: models_0_1.DescribeChangeSetHooksOutput.filterSensitiveLog,
+        };
+        const { requestHandler } = configuration;
+        return stack.resolve((request) => requestHandler.handle(request.request, options || {}), handlerExecutionContext);
+    }
+    serialize(input, context) {
+        return Aws_query_1.serializeAws_queryDescribeChangeSetHooksCommand(input, context);
+    }
+    deserialize(output, context) {
+        return Aws_query_1.deserializeAws_queryDescribeChangeSetHooksCommand(output, context);
+    }
+}
+exports.DescribeChangeSetHooksCommand = DescribeChangeSetHooksCommand;
 
 
 /***/ }),
@@ -5326,6 +5384,7 @@ tslib_1.__exportStar(__nccwpck_require__(589), exports);
 tslib_1.__exportStar(__nccwpck_require__(5931), exports);
 tslib_1.__exportStar(__nccwpck_require__(664), exports);
 tslib_1.__exportStar(__nccwpck_require__(4895), exports);
+tslib_1.__exportStar(__nccwpck_require__(6824), exports);
 tslib_1.__exportStar(__nccwpck_require__(7761), exports);
 tslib_1.__exportStar(__nccwpck_require__(3680), exports);
 tslib_1.__exportStar(__nccwpck_require__(7929), exports);
@@ -5390,10 +5449,6 @@ const regionHash = {
     "us-east-1": {
         variants: [
             {
-                hostname: "cloudformation.us-east-1.amazonaws.com",
-                tags: [],
-            },
-            {
                 hostname: "cloudformation-fips.us-east-1.amazonaws.com",
                 tags: ["fips"],
             },
@@ -5401,10 +5456,6 @@ const regionHash = {
     },
     "us-east-2": {
         variants: [
-            {
-                hostname: "cloudformation.us-east-2.amazonaws.com",
-                tags: [],
-            },
             {
                 hostname: "cloudformation-fips.us-east-2.amazonaws.com",
                 tags: ["fips"],
@@ -5432,10 +5483,6 @@ const regionHash = {
     "us-west-1": {
         variants: [
             {
-                hostname: "cloudformation.us-west-1.amazonaws.com",
-                tags: [],
-            },
-            {
                 hostname: "cloudformation-fips.us-west-1.amazonaws.com",
                 tags: ["fips"],
             },
@@ -5443,10 +5490,6 @@ const regionHash = {
     },
     "us-west-2": {
         variants: [
-            {
-                hostname: "cloudformation.us-west-2.amazonaws.com",
-                tags: [],
-            },
             {
                 hostname: "cloudformation-fips.us-west-2.amazonaws.com",
                 tags: ["fips"],
@@ -5465,6 +5508,7 @@ const partitionHash = {
             "ap-south-1",
             "ap-southeast-1",
             "ap-southeast-2",
+            "ap-southeast-3",
             "ca-central-1",
             "eu-central-1",
             "eu-north-1",
@@ -5619,11 +5663,11 @@ tslib_1.__exportStar(__nccwpck_require__(5378), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LimitExceededException = exports.InsufficientCapabilitiesException = exports.CreateChangeSetOutput = exports.CreateChangeSetInput = exports.Tag = exports.RollbackConfiguration = exports.RollbackTrigger = exports.ResourceToImport = exports.Parameter = exports.ContinueUpdateRollbackOutput = exports.ContinueUpdateRollbackInput = exports.ChangeSetType = exports.ChangeSetSummary = exports.ExecutionStatus = exports.ChangeSetStatus = exports.ChangeSetNotFoundException = exports.Change = exports.ChangeType = exports.ResourceChange = exports.Replacement = exports.ModuleInfo = exports.ResourceChangeDetail = exports.ResourceTargetDefinition = exports.RequiresRecreation = exports.ResourceAttribute = exports.EvaluationType = exports.ChangeSource = exports.ChangeAction = exports.Category = exports.Capability = exports.TokenAlreadyExistsException = exports.CancelUpdateStackInput = exports.CallAs = exports.TypeConfigurationNotFoundException = exports.BatchDescribeTypeConfigurationsOutput = exports.TypeConfigurationDetails = exports.BatchDescribeTypeConfigurationsError = exports.BatchDescribeTypeConfigurationsInput = exports.TypeConfigurationIdentifier = exports.AutoDeployment = exports.AlreadyExistsException = exports.TypeNotFoundException = exports.CFNRegistryException = exports.ActivateTypeOutput = exports.ActivateTypeInput = exports.VersionBump = exports.ThirdPartyType = exports.LoggingConfig = exports.AccountLimit = exports.AccountGateResult = void 0;
-exports.StackInstance = exports.StackInstanceComprehensiveStatus = exports.DescribeStackInstanceInput = exports.DescribeStackEventsOutput = exports.StackEvent = exports.ResourceStatus = exports.DescribeStackEventsInput = exports.DescribeStackDriftDetectionStatusOutput = exports.StackDriftStatus = exports.StackDriftDetectionStatus = exports.DescribeStackDriftDetectionStatusInput = exports.DescribePublisherOutput = exports.PublisherStatus = exports.IdentityProvider = exports.DescribePublisherInput = exports.DescribeChangeSetOutput = exports.DescribeChangeSetInput = exports.DescribeAccountLimitsOutput = exports.DescribeAccountLimitsInput = exports.DeregisterTypeOutput = exports.DeregisterTypeInput = exports.StackSetNotEmptyException = exports.DeleteStackSetOutput = exports.DeleteStackSetInput = exports.DeleteStackInstancesOutput = exports.DeleteStackInstancesInput = exports.DeleteStackInput = exports.InvalidChangeSetStatusException = exports.DeleteChangeSetOutput = exports.DeleteChangeSetInput = exports.DeactivateTypeOutput = exports.DeactivateTypeInput = exports.NameAlreadyExistsException = exports.CreateStackSetOutput = exports.CreateStackSetInput = exports.ManagedExecution = exports.CreatedButModifiedException = exports.StaleRequestException = exports.StackSetNotFoundException = exports.OperationInProgressException = exports.OperationIdAlreadyExistsException = exports.InvalidOperationException = exports.CreateStackInstancesOutput = exports.CreateStackInstancesInput = exports.StackSetOperationPreferences = exports.RegionConcurrencyType = exports.DeploymentTargets = exports.CreateStackOutput = exports.CreateStackInput = exports.OnFailure = void 0;
-exports.GetStackPolicyOutput = exports.GetStackPolicyInput = exports.ExecuteChangeSetOutput = exports.ExecuteChangeSetInput = exports.EstimateTemplateCostOutput = exports.EstimateTemplateCostInput = exports.DetectStackSetDriftOutput = exports.DetectStackSetDriftInput = exports.DetectStackResourceDriftOutput = exports.DetectStackResourceDriftInput = exports.DetectStackDriftOutput = exports.DetectStackDriftInput = exports.DescribeTypeRegistrationOutput = exports.DescribeTypeRegistrationInput = exports.DescribeTypeOutput = exports.TypeTestsStatus = exports.RequiredActivatedType = exports.DescribeTypeInput = exports.OperationNotFoundException = exports.DescribeStackSetOperationOutput = exports.StackSetOperation = exports.DescribeStackSetOperationInput = exports.DescribeStackSetOutput = exports.StackSet = exports.StackSetDriftDetectionDetails = exports.StackSetDriftStatus = exports.StackSetDriftDetectionStatus = exports.DescribeStackSetInput = exports.DescribeStacksOutput = exports.Stack = exports.StackStatus = exports.Output = exports.StackDriftInformation = exports.DescribeStacksInput = exports.DescribeStackResourcesOutput = exports.StackResource = exports.DescribeStackResourcesInput = exports.DescribeStackResourceDriftsOutput = exports.StackResourceDrift = exports.PropertyDifference = exports.DifferenceType = exports.PhysicalResourceIdContextKeyValuePair = exports.DescribeStackResourceDriftsInput = exports.DescribeStackResourceOutput = exports.StackResourceDetail = exports.StackResourceDriftInformation = exports.StackResourceDriftStatus = exports.DescribeStackResourceInput = exports.StackInstanceNotFoundException = exports.DescribeStackInstanceOutput = void 0;
-exports.PublishTypeOutput = exports.PublishTypeInput = exports.ListTypeVersionsOutput = exports.TypeVersionSummary = exports.ListTypeVersionsInput = exports.ListTypesOutput = exports.TypeSummary = exports.ListTypesInput = exports.TypeFilters = exports.ListTypeRegistrationsOutput = exports.ListTypeRegistrationsInput = exports.ListStackSetsOutput = exports.StackSetSummary = exports.ListStackSetsInput = exports.ListStackSetOperationsOutput = exports.StackSetOperationSummary = exports.ListStackSetOperationsInput = exports.ListStackSetOperationResultsOutput = exports.StackSetOperationResultSummary = exports.ListStackSetOperationResultsInput = exports.ListStacksOutput = exports.StackSummary = exports.StackDriftInformationSummary = exports.ListStacksInput = exports.ListStackResourcesOutput = exports.StackResourceSummary = exports.StackResourceDriftInformationSummary = exports.ListStackResourcesInput = exports.ListStackInstancesOutput = exports.StackInstanceSummary = exports.ListStackInstancesInput = exports.StackInstanceFilter = exports.ListImportsOutput = exports.ListImportsInput = exports.ListExportsOutput = exports.Export = exports.ListExportsInput = exports.ListChangeSetsOutput = exports.ListChangeSetsInput = exports.StackNotFoundException = exports.ImportStacksToStackSetOutput = exports.ImportStacksToStackSetInput = exports.GetTemplateSummaryOutput = exports.ResourceIdentifierSummary = exports.ParameterDeclaration = exports.ParameterConstraints = exports.GetTemplateSummaryInput = exports.GetTemplateOutput = exports.GetTemplateInput = exports.TemplateStage = void 0;
-exports.ValidateTemplateOutput = exports.TemplateParameter = exports.ValidateTemplateInput = exports.UpdateTerminationProtectionOutput = exports.UpdateTerminationProtectionInput = exports.UpdateStackSetOutput = exports.UpdateStackSetInput = exports.UpdateStackInstancesOutput = exports.UpdateStackInstancesInput = exports.UpdateStackOutput = exports.UpdateStackInput = exports.TestTypeOutput = exports.TestTypeInput = exports.StopStackSetOperationOutput = exports.StopStackSetOperationInput = exports.SignalResourceInput = exports.ResourceSignalStatus = exports.SetTypeDefaultVersionOutput = exports.SetTypeDefaultVersionInput = exports.SetTypeConfigurationOutput = exports.SetTypeConfigurationInput = exports.SetStackPolicyInput = exports.RollbackStackOutput = exports.RollbackStackInput = exports.RegisterTypeOutput = exports.RegisterTypeInput = exports.RegisterPublisherOutput = exports.RegisterPublisherInput = exports.RecordHandlerProgressOutput = exports.RecordHandlerProgressInput = exports.HandlerErrorCode = exports.OperationStatus = exports.OperationStatusCheckFailedException = exports.InvalidStateTransitionException = void 0;
+exports.OnFailure = exports.CreateChangeSetOutput = exports.CreateChangeSetInput = exports.Tag = exports.RollbackConfiguration = exports.RollbackTrigger = exports.ResourceToImport = exports.Parameter = exports.ContinueUpdateRollbackOutput = exports.ContinueUpdateRollbackInput = exports.ChangeSetType = exports.ChangeSetSummary = exports.ExecutionStatus = exports.ChangeSetStatus = exports.ChangeSetHooksStatus = exports.ChangeSetHook = exports.ChangeSetHookTargetDetails = exports.HookTargetType = exports.ChangeSetHookResourceTargetDetails = exports.HookInvocationPoint = exports.HookFailureMode = exports.Change = exports.ChangeType = exports.ResourceChange = exports.Replacement = exports.ModuleInfo = exports.ResourceChangeDetail = exports.ResourceTargetDefinition = exports.RequiresRecreation = exports.ResourceAttribute = exports.EvaluationType = exports.ChangeSource = exports.ChangeAction = exports.Category = exports.Capability = exports.CancelUpdateStackInput = exports.CallAs = exports.BatchDescribeTypeConfigurationsOutput = exports.TypeConfigurationDetails = exports.BatchDescribeTypeConfigurationsError = exports.BatchDescribeTypeConfigurationsInput = exports.TypeConfigurationIdentifier = exports.AutoDeployment = exports.ActivateTypeOutput = exports.ActivateTypeInput = exports.VersionBump = exports.ThirdPartyType = exports.LoggingConfig = exports.AccountLimit = exports.AccountGateResult = void 0;
+exports.DescribeStackResourceDriftsInput = exports.DescribeStackResourceOutput = exports.StackResourceDetail = exports.StackResourceDriftInformation = exports.StackResourceDriftStatus = exports.DescribeStackResourceInput = exports.DescribeStackInstanceOutput = exports.StackInstance = exports.StackInstanceComprehensiveStatus = exports.DescribeStackInstanceInput = exports.DescribeStackEventsOutput = exports.StackEvent = exports.ResourceStatus = exports.HookStatus = exports.DescribeStackEventsInput = exports.DescribeStackDriftDetectionStatusOutput = exports.StackDriftStatus = exports.StackDriftDetectionStatus = exports.DescribeStackDriftDetectionStatusInput = exports.DescribePublisherOutput = exports.PublisherStatus = exports.IdentityProvider = exports.DescribePublisherInput = exports.DescribeChangeSetHooksOutput = exports.DescribeChangeSetHooksInput = exports.DescribeChangeSetOutput = exports.DescribeChangeSetInput = exports.DescribeAccountLimitsOutput = exports.DescribeAccountLimitsInput = exports.DeregisterTypeOutput = exports.DeregisterTypeInput = exports.DeleteStackSetOutput = exports.DeleteStackSetInput = exports.DeleteStackInstancesOutput = exports.DeleteStackInstancesInput = exports.DeleteStackInput = exports.DeleteChangeSetOutput = exports.DeleteChangeSetInput = exports.DeactivateTypeOutput = exports.DeactivateTypeInput = exports.CreateStackSetOutput = exports.CreateStackSetInput = exports.ManagedExecution = exports.CreateStackInstancesOutput = exports.CreateStackInstancesInput = exports.StackSetOperationPreferences = exports.RegionConcurrencyType = exports.DeploymentTargets = exports.CreateStackOutput = exports.CreateStackInput = void 0;
+exports.ImportStacksToStackSetInput = exports.GetTemplateSummaryOutput = exports.ResourceIdentifierSummary = exports.ParameterDeclaration = exports.ParameterConstraints = exports.GetTemplateSummaryInput = exports.GetTemplateOutput = exports.GetTemplateInput = exports.TemplateStage = exports.GetStackPolicyOutput = exports.GetStackPolicyInput = exports.ExecuteChangeSetOutput = exports.ExecuteChangeSetInput = exports.EstimateTemplateCostOutput = exports.EstimateTemplateCostInput = exports.DetectStackSetDriftOutput = exports.DetectStackSetDriftInput = exports.DetectStackResourceDriftOutput = exports.DetectStackResourceDriftInput = exports.DetectStackDriftOutput = exports.DetectStackDriftInput = exports.DescribeTypeRegistrationOutput = exports.DescribeTypeRegistrationInput = exports.DescribeTypeOutput = exports.TypeTestsStatus = exports.RequiredActivatedType = exports.DescribeTypeInput = exports.DescribeStackSetOperationOutput = exports.StackSetOperation = exports.DescribeStackSetOperationInput = exports.DescribeStackSetOutput = exports.StackSet = exports.StackSetDriftDetectionDetails = exports.StackSetDriftStatus = exports.StackSetDriftDetectionStatus = exports.DescribeStackSetInput = exports.DescribeStacksOutput = exports.Stack = exports.StackStatus = exports.Output = exports.StackDriftInformation = exports.DescribeStacksInput = exports.DescribeStackResourcesOutput = exports.StackResource = exports.DescribeStackResourcesInput = exports.DescribeStackResourceDriftsOutput = exports.StackResourceDrift = exports.PropertyDifference = exports.DifferenceType = exports.PhysicalResourceIdContextKeyValuePair = void 0;
+exports.RollbackStackOutput = exports.RollbackStackInput = exports.RegisterTypeOutput = exports.RegisterTypeInput = exports.RegisterPublisherOutput = exports.RegisterPublisherInput = exports.RecordHandlerProgressOutput = exports.RecordHandlerProgressInput = exports.HandlerErrorCode = exports.OperationStatus = exports.PublishTypeOutput = exports.PublishTypeInput = exports.ListTypeVersionsOutput = exports.TypeVersionSummary = exports.ListTypeVersionsInput = exports.ListTypesOutput = exports.TypeSummary = exports.ListTypesInput = exports.TypeFilters = exports.ListTypeRegistrationsOutput = exports.ListTypeRegistrationsInput = exports.ListStackSetsOutput = exports.StackSetSummary = exports.ListStackSetsInput = exports.ListStackSetOperationsOutput = exports.StackSetOperationSummary = exports.ListStackSetOperationsInput = exports.ListStackSetOperationResultsOutput = exports.StackSetOperationResultSummary = exports.ListStackSetOperationResultsInput = exports.ListStacksOutput = exports.StackSummary = exports.StackDriftInformationSummary = exports.ListStacksInput = exports.ListStackResourcesOutput = exports.StackResourceSummary = exports.StackResourceDriftInformationSummary = exports.ListStackResourcesInput = exports.ListStackInstancesOutput = exports.StackInstanceSummary = exports.ListStackInstancesInput = exports.StackInstanceFilter = exports.ListImportsOutput = exports.ListImportsInput = exports.ListExportsOutput = exports.Export = exports.ListExportsInput = exports.ListChangeSetsOutput = exports.ListChangeSetsInput = exports.ImportStacksToStackSetOutput = void 0;
+exports.ValidateTemplateOutput = exports.TemplateParameter = exports.ValidateTemplateInput = exports.UpdateTerminationProtectionOutput = exports.UpdateTerminationProtectionInput = exports.UpdateStackSetOutput = exports.UpdateStackSetInput = exports.UpdateStackInstancesOutput = exports.UpdateStackInstancesInput = exports.UpdateStackOutput = exports.UpdateStackInput = exports.TestTypeOutput = exports.TestTypeInput = exports.StopStackSetOperationOutput = exports.StopStackSetOperationInput = exports.SignalResourceInput = exports.ResourceSignalStatus = exports.SetTypeDefaultVersionOutput = exports.SetTypeDefaultVersionInput = exports.SetTypeConfigurationOutput = exports.SetTypeConfigurationInput = exports.SetStackPolicyInput = void 0;
 var AccountGateResult;
 (function (AccountGateResult) {
     AccountGateResult.filterSensitiveLog = (obj) => ({
@@ -5644,6 +5688,7 @@ var LoggingConfig;
 })(LoggingConfig = exports.LoggingConfig || (exports.LoggingConfig = {}));
 var ThirdPartyType;
 (function (ThirdPartyType) {
+    ThirdPartyType["HOOK"] = "HOOK";
     ThirdPartyType["MODULE"] = "MODULE";
     ThirdPartyType["RESOURCE"] = "RESOURCE";
 })(ThirdPartyType = exports.ThirdPartyType || (exports.ThirdPartyType = {}));
@@ -5664,24 +5709,6 @@ var ActivateTypeOutput;
         ...obj,
     });
 })(ActivateTypeOutput = exports.ActivateTypeOutput || (exports.ActivateTypeOutput = {}));
-var CFNRegistryException;
-(function (CFNRegistryException) {
-    CFNRegistryException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(CFNRegistryException = exports.CFNRegistryException || (exports.CFNRegistryException = {}));
-var TypeNotFoundException;
-(function (TypeNotFoundException) {
-    TypeNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(TypeNotFoundException = exports.TypeNotFoundException || (exports.TypeNotFoundException = {}));
-var AlreadyExistsException;
-(function (AlreadyExistsException) {
-    AlreadyExistsException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(AlreadyExistsException = exports.AlreadyExistsException || (exports.AlreadyExistsException = {}));
 var AutoDeployment;
 (function (AutoDeployment) {
     AutoDeployment.filterSensitiveLog = (obj) => ({
@@ -5718,12 +5745,6 @@ var BatchDescribeTypeConfigurationsOutput;
         ...obj,
     });
 })(BatchDescribeTypeConfigurationsOutput = exports.BatchDescribeTypeConfigurationsOutput || (exports.BatchDescribeTypeConfigurationsOutput = {}));
-var TypeConfigurationNotFoundException;
-(function (TypeConfigurationNotFoundException) {
-    TypeConfigurationNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(TypeConfigurationNotFoundException = exports.TypeConfigurationNotFoundException || (exports.TypeConfigurationNotFoundException = {}));
 var CallAs;
 (function (CallAs) {
     CallAs["DELEGATED_ADMIN"] = "DELEGATED_ADMIN";
@@ -5735,12 +5756,6 @@ var CancelUpdateStackInput;
         ...obj,
     });
 })(CancelUpdateStackInput = exports.CancelUpdateStackInput || (exports.CancelUpdateStackInput = {}));
-var TokenAlreadyExistsException;
-(function (TokenAlreadyExistsException) {
-    TokenAlreadyExistsException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(TokenAlreadyExistsException = exports.TokenAlreadyExistsException || (exports.TokenAlreadyExistsException = {}));
 var Capability;
 (function (Capability) {
     Capability["CAPABILITY_AUTO_EXPAND"] = "CAPABILITY_AUTO_EXPAND";
@@ -5830,12 +5845,43 @@ var Change;
         ...obj,
     });
 })(Change = exports.Change || (exports.Change = {}));
-var ChangeSetNotFoundException;
-(function (ChangeSetNotFoundException) {
-    ChangeSetNotFoundException.filterSensitiveLog = (obj) => ({
+var HookFailureMode;
+(function (HookFailureMode) {
+    HookFailureMode["FAIL"] = "FAIL";
+    HookFailureMode["WARN"] = "WARN";
+})(HookFailureMode = exports.HookFailureMode || (exports.HookFailureMode = {}));
+var HookInvocationPoint;
+(function (HookInvocationPoint) {
+    HookInvocationPoint["PRE_PROVISION"] = "PRE_PROVISION";
+})(HookInvocationPoint = exports.HookInvocationPoint || (exports.HookInvocationPoint = {}));
+var ChangeSetHookResourceTargetDetails;
+(function (ChangeSetHookResourceTargetDetails) {
+    ChangeSetHookResourceTargetDetails.filterSensitiveLog = (obj) => ({
         ...obj,
     });
-})(ChangeSetNotFoundException = exports.ChangeSetNotFoundException || (exports.ChangeSetNotFoundException = {}));
+})(ChangeSetHookResourceTargetDetails = exports.ChangeSetHookResourceTargetDetails || (exports.ChangeSetHookResourceTargetDetails = {}));
+var HookTargetType;
+(function (HookTargetType) {
+    HookTargetType["RESOURCE"] = "RESOURCE";
+})(HookTargetType = exports.HookTargetType || (exports.HookTargetType = {}));
+var ChangeSetHookTargetDetails;
+(function (ChangeSetHookTargetDetails) {
+    ChangeSetHookTargetDetails.filterSensitiveLog = (obj) => ({
+        ...obj,
+    });
+})(ChangeSetHookTargetDetails = exports.ChangeSetHookTargetDetails || (exports.ChangeSetHookTargetDetails = {}));
+var ChangeSetHook;
+(function (ChangeSetHook) {
+    ChangeSetHook.filterSensitiveLog = (obj) => ({
+        ...obj,
+    });
+})(ChangeSetHook = exports.ChangeSetHook || (exports.ChangeSetHook = {}));
+var ChangeSetHooksStatus;
+(function (ChangeSetHooksStatus) {
+    ChangeSetHooksStatus["PLANNED"] = "PLANNED";
+    ChangeSetHooksStatus["PLANNING"] = "PLANNING";
+    ChangeSetHooksStatus["UNAVAILABLE"] = "UNAVAILABLE";
+})(ChangeSetHooksStatus = exports.ChangeSetHooksStatus || (exports.ChangeSetHooksStatus = {}));
 var ChangeSetStatus;
 (function (ChangeSetStatus) {
     ChangeSetStatus["CREATE_COMPLETE"] = "CREATE_COMPLETE";
@@ -5922,18 +5968,6 @@ var CreateChangeSetOutput;
         ...obj,
     });
 })(CreateChangeSetOutput = exports.CreateChangeSetOutput || (exports.CreateChangeSetOutput = {}));
-var InsufficientCapabilitiesException;
-(function (InsufficientCapabilitiesException) {
-    InsufficientCapabilitiesException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InsufficientCapabilitiesException = exports.InsufficientCapabilitiesException || (exports.InsufficientCapabilitiesException = {}));
-var LimitExceededException;
-(function (LimitExceededException) {
-    LimitExceededException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(LimitExceededException = exports.LimitExceededException || (exports.LimitExceededException = {}));
 var OnFailure;
 (function (OnFailure) {
     OnFailure["DELETE"] = "DELETE";
@@ -5981,42 +6015,6 @@ var CreateStackInstancesOutput;
         ...obj,
     });
 })(CreateStackInstancesOutput = exports.CreateStackInstancesOutput || (exports.CreateStackInstancesOutput = {}));
-var InvalidOperationException;
-(function (InvalidOperationException) {
-    InvalidOperationException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InvalidOperationException = exports.InvalidOperationException || (exports.InvalidOperationException = {}));
-var OperationIdAlreadyExistsException;
-(function (OperationIdAlreadyExistsException) {
-    OperationIdAlreadyExistsException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(OperationIdAlreadyExistsException = exports.OperationIdAlreadyExistsException || (exports.OperationIdAlreadyExistsException = {}));
-var OperationInProgressException;
-(function (OperationInProgressException) {
-    OperationInProgressException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(OperationInProgressException = exports.OperationInProgressException || (exports.OperationInProgressException = {}));
-var StackSetNotFoundException;
-(function (StackSetNotFoundException) {
-    StackSetNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(StackSetNotFoundException = exports.StackSetNotFoundException || (exports.StackSetNotFoundException = {}));
-var StaleRequestException;
-(function (StaleRequestException) {
-    StaleRequestException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(StaleRequestException = exports.StaleRequestException || (exports.StaleRequestException = {}));
-var CreatedButModifiedException;
-(function (CreatedButModifiedException) {
-    CreatedButModifiedException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(CreatedButModifiedException = exports.CreatedButModifiedException || (exports.CreatedButModifiedException = {}));
 var ManagedExecution;
 (function (ManagedExecution) {
     ManagedExecution.filterSensitiveLog = (obj) => ({
@@ -6035,12 +6033,6 @@ var CreateStackSetOutput;
         ...obj,
     });
 })(CreateStackSetOutput = exports.CreateStackSetOutput || (exports.CreateStackSetOutput = {}));
-var NameAlreadyExistsException;
-(function (NameAlreadyExistsException) {
-    NameAlreadyExistsException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(NameAlreadyExistsException = exports.NameAlreadyExistsException || (exports.NameAlreadyExistsException = {}));
 var DeactivateTypeInput;
 (function (DeactivateTypeInput) {
     DeactivateTypeInput.filterSensitiveLog = (obj) => ({
@@ -6065,12 +6057,6 @@ var DeleteChangeSetOutput;
         ...obj,
     });
 })(DeleteChangeSetOutput = exports.DeleteChangeSetOutput || (exports.DeleteChangeSetOutput = {}));
-var InvalidChangeSetStatusException;
-(function (InvalidChangeSetStatusException) {
-    InvalidChangeSetStatusException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InvalidChangeSetStatusException = exports.InvalidChangeSetStatusException || (exports.InvalidChangeSetStatusException = {}));
 var DeleteStackInput;
 (function (DeleteStackInput) {
     DeleteStackInput.filterSensitiveLog = (obj) => ({
@@ -6101,12 +6087,6 @@ var DeleteStackSetOutput;
         ...obj,
     });
 })(DeleteStackSetOutput = exports.DeleteStackSetOutput || (exports.DeleteStackSetOutput = {}));
-var StackSetNotEmptyException;
-(function (StackSetNotEmptyException) {
-    StackSetNotEmptyException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(StackSetNotEmptyException = exports.StackSetNotEmptyException || (exports.StackSetNotEmptyException = {}));
 var DeregisterTypeInput;
 (function (DeregisterTypeInput) {
     DeregisterTypeInput.filterSensitiveLog = (obj) => ({
@@ -6143,6 +6123,18 @@ var DescribeChangeSetOutput;
         ...obj,
     });
 })(DescribeChangeSetOutput = exports.DescribeChangeSetOutput || (exports.DescribeChangeSetOutput = {}));
+var DescribeChangeSetHooksInput;
+(function (DescribeChangeSetHooksInput) {
+    DescribeChangeSetHooksInput.filterSensitiveLog = (obj) => ({
+        ...obj,
+    });
+})(DescribeChangeSetHooksInput = exports.DescribeChangeSetHooksInput || (exports.DescribeChangeSetHooksInput = {}));
+var DescribeChangeSetHooksOutput;
+(function (DescribeChangeSetHooksOutput) {
+    DescribeChangeSetHooksOutput.filterSensitiveLog = (obj) => ({
+        ...obj,
+    });
+})(DescribeChangeSetHooksOutput = exports.DescribeChangeSetHooksOutput || (exports.DescribeChangeSetHooksOutput = {}));
 var DescribePublisherInput;
 (function (DescribePublisherInput) {
     DescribePublisherInput.filterSensitiveLog = (obj) => ({
@@ -6197,6 +6189,13 @@ var DescribeStackEventsInput;
         ...obj,
     });
 })(DescribeStackEventsInput = exports.DescribeStackEventsInput || (exports.DescribeStackEventsInput = {}));
+var HookStatus;
+(function (HookStatus) {
+    HookStatus["HOOK_COMPLETE_FAILED"] = "HOOK_COMPLETE_FAILED";
+    HookStatus["HOOK_COMPLETE_SUCCEEDED"] = "HOOK_COMPLETE_SUCCEEDED";
+    HookStatus["HOOK_FAILED"] = "HOOK_FAILED";
+    HookStatus["HOOK_IN_PROGRESS"] = "HOOK_IN_PROGRESS";
+})(HookStatus = exports.HookStatus || (exports.HookStatus = {}));
 var ResourceStatus;
 (function (ResourceStatus) {
     ResourceStatus["CREATE_COMPLETE"] = "CREATE_COMPLETE";
@@ -6258,12 +6257,6 @@ var DescribeStackInstanceOutput;
         ...obj,
     });
 })(DescribeStackInstanceOutput = exports.DescribeStackInstanceOutput || (exports.DescribeStackInstanceOutput = {}));
-var StackInstanceNotFoundException;
-(function (StackInstanceNotFoundException) {
-    StackInstanceNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(StackInstanceNotFoundException = exports.StackInstanceNotFoundException || (exports.StackInstanceNotFoundException = {}));
 var DescribeStackResourceInput;
 (function (DescribeStackResourceInput) {
     DescribeStackResourceInput.filterSensitiveLog = (obj) => ({
@@ -6461,12 +6454,6 @@ var DescribeStackSetOperationOutput;
         ...obj,
     });
 })(DescribeStackSetOperationOutput = exports.DescribeStackSetOperationOutput || (exports.DescribeStackSetOperationOutput = {}));
-var OperationNotFoundException;
-(function (OperationNotFoundException) {
-    OperationNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(OperationNotFoundException = exports.OperationNotFoundException || (exports.OperationNotFoundException = {}));
 var DescribeTypeInput;
 (function (DescribeTypeInput) {
     DescribeTypeInput.filterSensitiveLog = (obj) => ({
@@ -6635,12 +6622,6 @@ var ImportStacksToStackSetOutput;
         ...obj,
     });
 })(ImportStacksToStackSetOutput = exports.ImportStacksToStackSetOutput || (exports.ImportStacksToStackSetOutput = {}));
-var StackNotFoundException;
-(function (StackNotFoundException) {
-    StackNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(StackNotFoundException = exports.StackNotFoundException || (exports.StackNotFoundException = {}));
 var ListChangeSetsInput;
 (function (ListChangeSetsInput) {
     ListChangeSetsInput.filterSensitiveLog = (obj) => ({
@@ -6875,18 +6856,6 @@ var PublishTypeOutput;
         ...obj,
     });
 })(PublishTypeOutput = exports.PublishTypeOutput || (exports.PublishTypeOutput = {}));
-var InvalidStateTransitionException;
-(function (InvalidStateTransitionException) {
-    InvalidStateTransitionException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InvalidStateTransitionException = exports.InvalidStateTransitionException || (exports.InvalidStateTransitionException = {}));
-var OperationStatusCheckFailedException;
-(function (OperationStatusCheckFailedException) {
-    OperationStatusCheckFailedException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(OperationStatusCheckFailedException = exports.OperationStatusCheckFailedException || (exports.OperationStatusCheckFailedException = {}));
 var OperationStatus;
 (function (OperationStatus) {
     OperationStatus["FAILED"] = "FAILED";
@@ -6899,11 +6868,13 @@ var HandlerErrorCode;
     HandlerErrorCode["AccessDenied"] = "AccessDenied";
     HandlerErrorCode["AlreadyExists"] = "AlreadyExists";
     HandlerErrorCode["GeneralServiceException"] = "GeneralServiceException";
+    HandlerErrorCode["HandlerInternalFailure"] = "HandlerInternalFailure";
     HandlerErrorCode["InternalFailure"] = "InternalFailure";
     HandlerErrorCode["InvalidCredentials"] = "InvalidCredentials";
     HandlerErrorCode["InvalidRequest"] = "InvalidRequest";
     HandlerErrorCode["InvalidTypeConfiguration"] = "InvalidTypeConfiguration";
     HandlerErrorCode["NetworkFailure"] = "NetworkFailure";
+    HandlerErrorCode["NonCompliant"] = "NonCompliant";
     HandlerErrorCode["NotFound"] = "NotFound";
     HandlerErrorCode["NotUpdatable"] = "NotUpdatable";
     HandlerErrorCode["ResourceConflict"] = "ResourceConflict";
@@ -6911,6 +6882,7 @@ var HandlerErrorCode;
     HandlerErrorCode["ServiceLimitExceeded"] = "ServiceLimitExceeded";
     HandlerErrorCode["ServiceTimeout"] = "NotStabilized";
     HandlerErrorCode["Throttling"] = "Throttling";
+    HandlerErrorCode["Unknown"] = "Unknown";
 })(HandlerErrorCode = exports.HandlerErrorCode || (exports.HandlerErrorCode = {}));
 var RecordHandlerProgressInput;
 (function (RecordHandlerProgressInput) {
@@ -7800,9 +7772,9 @@ tslib_1.__exportStar(__nccwpck_require__(985), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.serializeAws_queryPublishTypeCommand = exports.serializeAws_queryListTypeVersionsCommand = exports.serializeAws_queryListTypesCommand = exports.serializeAws_queryListTypeRegistrationsCommand = exports.serializeAws_queryListStackSetsCommand = exports.serializeAws_queryListStackSetOperationsCommand = exports.serializeAws_queryListStackSetOperationResultsCommand = exports.serializeAws_queryListStacksCommand = exports.serializeAws_queryListStackResourcesCommand = exports.serializeAws_queryListStackInstancesCommand = exports.serializeAws_queryListImportsCommand = exports.serializeAws_queryListExportsCommand = exports.serializeAws_queryListChangeSetsCommand = exports.serializeAws_queryImportStacksToStackSetCommand = exports.serializeAws_queryGetTemplateSummaryCommand = exports.serializeAws_queryGetTemplateCommand = exports.serializeAws_queryGetStackPolicyCommand = exports.serializeAws_queryExecuteChangeSetCommand = exports.serializeAws_queryEstimateTemplateCostCommand = exports.serializeAws_queryDetectStackSetDriftCommand = exports.serializeAws_queryDetectStackResourceDriftCommand = exports.serializeAws_queryDetectStackDriftCommand = exports.serializeAws_queryDescribeTypeRegistrationCommand = exports.serializeAws_queryDescribeTypeCommand = exports.serializeAws_queryDescribeStackSetOperationCommand = exports.serializeAws_queryDescribeStackSetCommand = exports.serializeAws_queryDescribeStacksCommand = exports.serializeAws_queryDescribeStackResourcesCommand = exports.serializeAws_queryDescribeStackResourceDriftsCommand = exports.serializeAws_queryDescribeStackResourceCommand = exports.serializeAws_queryDescribeStackInstanceCommand = exports.serializeAws_queryDescribeStackEventsCommand = exports.serializeAws_queryDescribeStackDriftDetectionStatusCommand = exports.serializeAws_queryDescribePublisherCommand = exports.serializeAws_queryDescribeChangeSetCommand = exports.serializeAws_queryDescribeAccountLimitsCommand = exports.serializeAws_queryDeregisterTypeCommand = exports.serializeAws_queryDeleteStackSetCommand = exports.serializeAws_queryDeleteStackInstancesCommand = exports.serializeAws_queryDeleteStackCommand = exports.serializeAws_queryDeleteChangeSetCommand = exports.serializeAws_queryDeactivateTypeCommand = exports.serializeAws_queryCreateStackSetCommand = exports.serializeAws_queryCreateStackInstancesCommand = exports.serializeAws_queryCreateStackCommand = exports.serializeAws_queryCreateChangeSetCommand = exports.serializeAws_queryContinueUpdateRollbackCommand = exports.serializeAws_queryCancelUpdateStackCommand = exports.serializeAws_queryBatchDescribeTypeConfigurationsCommand = exports.serializeAws_queryActivateTypeCommand = void 0;
-exports.deserializeAws_queryGetTemplateCommand = exports.deserializeAws_queryGetStackPolicyCommand = exports.deserializeAws_queryExecuteChangeSetCommand = exports.deserializeAws_queryEstimateTemplateCostCommand = exports.deserializeAws_queryDetectStackSetDriftCommand = exports.deserializeAws_queryDetectStackResourceDriftCommand = exports.deserializeAws_queryDetectStackDriftCommand = exports.deserializeAws_queryDescribeTypeRegistrationCommand = exports.deserializeAws_queryDescribeTypeCommand = exports.deserializeAws_queryDescribeStackSetOperationCommand = exports.deserializeAws_queryDescribeStackSetCommand = exports.deserializeAws_queryDescribeStacksCommand = exports.deserializeAws_queryDescribeStackResourcesCommand = exports.deserializeAws_queryDescribeStackResourceDriftsCommand = exports.deserializeAws_queryDescribeStackResourceCommand = exports.deserializeAws_queryDescribeStackInstanceCommand = exports.deserializeAws_queryDescribeStackEventsCommand = exports.deserializeAws_queryDescribeStackDriftDetectionStatusCommand = exports.deserializeAws_queryDescribePublisherCommand = exports.deserializeAws_queryDescribeChangeSetCommand = exports.deserializeAws_queryDescribeAccountLimitsCommand = exports.deserializeAws_queryDeregisterTypeCommand = exports.deserializeAws_queryDeleteStackSetCommand = exports.deserializeAws_queryDeleteStackInstancesCommand = exports.deserializeAws_queryDeleteStackCommand = exports.deserializeAws_queryDeleteChangeSetCommand = exports.deserializeAws_queryDeactivateTypeCommand = exports.deserializeAws_queryCreateStackSetCommand = exports.deserializeAws_queryCreateStackInstancesCommand = exports.deserializeAws_queryCreateStackCommand = exports.deserializeAws_queryCreateChangeSetCommand = exports.deserializeAws_queryContinueUpdateRollbackCommand = exports.deserializeAws_queryCancelUpdateStackCommand = exports.deserializeAws_queryBatchDescribeTypeConfigurationsCommand = exports.deserializeAws_queryActivateTypeCommand = exports.serializeAws_queryValidateTemplateCommand = exports.serializeAws_queryUpdateTerminationProtectionCommand = exports.serializeAws_queryUpdateStackSetCommand = exports.serializeAws_queryUpdateStackInstancesCommand = exports.serializeAws_queryUpdateStackCommand = exports.serializeAws_queryTestTypeCommand = exports.serializeAws_queryStopStackSetOperationCommand = exports.serializeAws_querySignalResourceCommand = exports.serializeAws_querySetTypeDefaultVersionCommand = exports.serializeAws_querySetTypeConfigurationCommand = exports.serializeAws_querySetStackPolicyCommand = exports.serializeAws_queryRollbackStackCommand = exports.serializeAws_queryRegisterTypeCommand = exports.serializeAws_queryRegisterPublisherCommand = exports.serializeAws_queryRecordHandlerProgressCommand = void 0;
-exports.deserializeAws_queryValidateTemplateCommand = exports.deserializeAws_queryUpdateTerminationProtectionCommand = exports.deserializeAws_queryUpdateStackSetCommand = exports.deserializeAws_queryUpdateStackInstancesCommand = exports.deserializeAws_queryUpdateStackCommand = exports.deserializeAws_queryTestTypeCommand = exports.deserializeAws_queryStopStackSetOperationCommand = exports.deserializeAws_querySignalResourceCommand = exports.deserializeAws_querySetTypeDefaultVersionCommand = exports.deserializeAws_querySetTypeConfigurationCommand = exports.deserializeAws_querySetStackPolicyCommand = exports.deserializeAws_queryRollbackStackCommand = exports.deserializeAws_queryRegisterTypeCommand = exports.deserializeAws_queryRegisterPublisherCommand = exports.deserializeAws_queryRecordHandlerProgressCommand = exports.deserializeAws_queryPublishTypeCommand = exports.deserializeAws_queryListTypeVersionsCommand = exports.deserializeAws_queryListTypesCommand = exports.deserializeAws_queryListTypeRegistrationsCommand = exports.deserializeAws_queryListStackSetsCommand = exports.deserializeAws_queryListStackSetOperationsCommand = exports.deserializeAws_queryListStackSetOperationResultsCommand = exports.deserializeAws_queryListStacksCommand = exports.deserializeAws_queryListStackResourcesCommand = exports.deserializeAws_queryListStackInstancesCommand = exports.deserializeAws_queryListImportsCommand = exports.deserializeAws_queryListExportsCommand = exports.deserializeAws_queryListChangeSetsCommand = exports.deserializeAws_queryImportStacksToStackSetCommand = exports.deserializeAws_queryGetTemplateSummaryCommand = void 0;
+exports.serializeAws_queryListTypeVersionsCommand = exports.serializeAws_queryListTypesCommand = exports.serializeAws_queryListTypeRegistrationsCommand = exports.serializeAws_queryListStackSetsCommand = exports.serializeAws_queryListStackSetOperationsCommand = exports.serializeAws_queryListStackSetOperationResultsCommand = exports.serializeAws_queryListStacksCommand = exports.serializeAws_queryListStackResourcesCommand = exports.serializeAws_queryListStackInstancesCommand = exports.serializeAws_queryListImportsCommand = exports.serializeAws_queryListExportsCommand = exports.serializeAws_queryListChangeSetsCommand = exports.serializeAws_queryImportStacksToStackSetCommand = exports.serializeAws_queryGetTemplateSummaryCommand = exports.serializeAws_queryGetTemplateCommand = exports.serializeAws_queryGetStackPolicyCommand = exports.serializeAws_queryExecuteChangeSetCommand = exports.serializeAws_queryEstimateTemplateCostCommand = exports.serializeAws_queryDetectStackSetDriftCommand = exports.serializeAws_queryDetectStackResourceDriftCommand = exports.serializeAws_queryDetectStackDriftCommand = exports.serializeAws_queryDescribeTypeRegistrationCommand = exports.serializeAws_queryDescribeTypeCommand = exports.serializeAws_queryDescribeStackSetOperationCommand = exports.serializeAws_queryDescribeStackSetCommand = exports.serializeAws_queryDescribeStacksCommand = exports.serializeAws_queryDescribeStackResourcesCommand = exports.serializeAws_queryDescribeStackResourceDriftsCommand = exports.serializeAws_queryDescribeStackResourceCommand = exports.serializeAws_queryDescribeStackInstanceCommand = exports.serializeAws_queryDescribeStackEventsCommand = exports.serializeAws_queryDescribeStackDriftDetectionStatusCommand = exports.serializeAws_queryDescribePublisherCommand = exports.serializeAws_queryDescribeChangeSetHooksCommand = exports.serializeAws_queryDescribeChangeSetCommand = exports.serializeAws_queryDescribeAccountLimitsCommand = exports.serializeAws_queryDeregisterTypeCommand = exports.serializeAws_queryDeleteStackSetCommand = exports.serializeAws_queryDeleteStackInstancesCommand = exports.serializeAws_queryDeleteStackCommand = exports.serializeAws_queryDeleteChangeSetCommand = exports.serializeAws_queryDeactivateTypeCommand = exports.serializeAws_queryCreateStackSetCommand = exports.serializeAws_queryCreateStackInstancesCommand = exports.serializeAws_queryCreateStackCommand = exports.serializeAws_queryCreateChangeSetCommand = exports.serializeAws_queryContinueUpdateRollbackCommand = exports.serializeAws_queryCancelUpdateStackCommand = exports.serializeAws_queryBatchDescribeTypeConfigurationsCommand = exports.serializeAws_queryActivateTypeCommand = void 0;
+exports.deserializeAws_queryExecuteChangeSetCommand = exports.deserializeAws_queryEstimateTemplateCostCommand = exports.deserializeAws_queryDetectStackSetDriftCommand = exports.deserializeAws_queryDetectStackResourceDriftCommand = exports.deserializeAws_queryDetectStackDriftCommand = exports.deserializeAws_queryDescribeTypeRegistrationCommand = exports.deserializeAws_queryDescribeTypeCommand = exports.deserializeAws_queryDescribeStackSetOperationCommand = exports.deserializeAws_queryDescribeStackSetCommand = exports.deserializeAws_queryDescribeStacksCommand = exports.deserializeAws_queryDescribeStackResourcesCommand = exports.deserializeAws_queryDescribeStackResourceDriftsCommand = exports.deserializeAws_queryDescribeStackResourceCommand = exports.deserializeAws_queryDescribeStackInstanceCommand = exports.deserializeAws_queryDescribeStackEventsCommand = exports.deserializeAws_queryDescribeStackDriftDetectionStatusCommand = exports.deserializeAws_queryDescribePublisherCommand = exports.deserializeAws_queryDescribeChangeSetHooksCommand = exports.deserializeAws_queryDescribeChangeSetCommand = exports.deserializeAws_queryDescribeAccountLimitsCommand = exports.deserializeAws_queryDeregisterTypeCommand = exports.deserializeAws_queryDeleteStackSetCommand = exports.deserializeAws_queryDeleteStackInstancesCommand = exports.deserializeAws_queryDeleteStackCommand = exports.deserializeAws_queryDeleteChangeSetCommand = exports.deserializeAws_queryDeactivateTypeCommand = exports.deserializeAws_queryCreateStackSetCommand = exports.deserializeAws_queryCreateStackInstancesCommand = exports.deserializeAws_queryCreateStackCommand = exports.deserializeAws_queryCreateChangeSetCommand = exports.deserializeAws_queryContinueUpdateRollbackCommand = exports.deserializeAws_queryCancelUpdateStackCommand = exports.deserializeAws_queryBatchDescribeTypeConfigurationsCommand = exports.deserializeAws_queryActivateTypeCommand = exports.serializeAws_queryValidateTemplateCommand = exports.serializeAws_queryUpdateTerminationProtectionCommand = exports.serializeAws_queryUpdateStackSetCommand = exports.serializeAws_queryUpdateStackInstancesCommand = exports.serializeAws_queryUpdateStackCommand = exports.serializeAws_queryTestTypeCommand = exports.serializeAws_queryStopStackSetOperationCommand = exports.serializeAws_querySignalResourceCommand = exports.serializeAws_querySetTypeDefaultVersionCommand = exports.serializeAws_querySetTypeConfigurationCommand = exports.serializeAws_querySetStackPolicyCommand = exports.serializeAws_queryRollbackStackCommand = exports.serializeAws_queryRegisterTypeCommand = exports.serializeAws_queryRegisterPublisherCommand = exports.serializeAws_queryRecordHandlerProgressCommand = exports.serializeAws_queryPublishTypeCommand = void 0;
+exports.deserializeAws_queryValidateTemplateCommand = exports.deserializeAws_queryUpdateTerminationProtectionCommand = exports.deserializeAws_queryUpdateStackSetCommand = exports.deserializeAws_queryUpdateStackInstancesCommand = exports.deserializeAws_queryUpdateStackCommand = exports.deserializeAws_queryTestTypeCommand = exports.deserializeAws_queryStopStackSetOperationCommand = exports.deserializeAws_querySignalResourceCommand = exports.deserializeAws_querySetTypeDefaultVersionCommand = exports.deserializeAws_querySetTypeConfigurationCommand = exports.deserializeAws_querySetStackPolicyCommand = exports.deserializeAws_queryRollbackStackCommand = exports.deserializeAws_queryRegisterTypeCommand = exports.deserializeAws_queryRegisterPublisherCommand = exports.deserializeAws_queryRecordHandlerProgressCommand = exports.deserializeAws_queryPublishTypeCommand = exports.deserializeAws_queryListTypeVersionsCommand = exports.deserializeAws_queryListTypesCommand = exports.deserializeAws_queryListTypeRegistrationsCommand = exports.deserializeAws_queryListStackSetsCommand = exports.deserializeAws_queryListStackSetOperationsCommand = exports.deserializeAws_queryListStackSetOperationResultsCommand = exports.deserializeAws_queryListStacksCommand = exports.deserializeAws_queryListStackResourcesCommand = exports.deserializeAws_queryListStackInstancesCommand = exports.deserializeAws_queryListImportsCommand = exports.deserializeAws_queryListExportsCommand = exports.deserializeAws_queryListChangeSetsCommand = exports.deserializeAws_queryImportStacksToStackSetCommand = exports.deserializeAws_queryGetTemplateSummaryCommand = exports.deserializeAws_queryGetTemplateCommand = exports.deserializeAws_queryGetStackPolicyCommand = void 0;
 const protocol_http_1 = __nccwpck_require__(223);
 const smithy_client_1 = __nccwpck_require__(4963);
 const entities_1 = __nccwpck_require__(3000);
@@ -8016,6 +7988,19 @@ const serializeAws_queryDescribeChangeSetCommand = async (input, context) => {
     return buildHttpRpcRequest(context, headers, "/", undefined, body);
 };
 exports.serializeAws_queryDescribeChangeSetCommand = serializeAws_queryDescribeChangeSetCommand;
+const serializeAws_queryDescribeChangeSetHooksCommand = async (input, context) => {
+    const headers = {
+        "content-type": "application/x-www-form-urlencoded",
+    };
+    let body;
+    body = buildFormUrlencodedString({
+        ...serializeAws_queryDescribeChangeSetHooksInput(input, context),
+        Action: "DescribeChangeSetHooks",
+        Version: "2010-05-15",
+    });
+    return buildHttpRpcRequest(context, headers, "/", undefined, body);
+};
+exports.serializeAws_queryDescribeChangeSetHooksCommand = serializeAws_queryDescribeChangeSetHooksCommand;
 const serializeAws_queryDescribePublisherCommand = async (input, context) => {
     const headers = {
         "content-type": "application/x-www-form-urlencoded",
@@ -9527,6 +9512,53 @@ const deserializeAws_queryDescribeChangeSetCommand = async (output, context) => 
 };
 exports.deserializeAws_queryDescribeChangeSetCommand = deserializeAws_queryDescribeChangeSetCommand;
 const deserializeAws_queryDescribeChangeSetCommandError = async (output, context) => {
+    const parsedOutput = {
+        ...output,
+        body: await parseBody(output.body, context),
+    };
+    let response;
+    let errorCode = "UnknownError";
+    errorCode = loadQueryErrorCode(output, parsedOutput.body);
+    switch (errorCode) {
+        case "ChangeSetNotFoundException":
+        case "com.amazonaws.cloudformation#ChangeSetNotFoundException":
+            response = {
+                ...(await deserializeAws_queryChangeSetNotFoundExceptionResponse(parsedOutput, context)),
+                name: errorCode,
+                $metadata: deserializeMetadata(output),
+            };
+            break;
+        default:
+            const parsedBody = parsedOutput.body;
+            errorCode = parsedBody.Error.code || parsedBody.Error.Code || errorCode;
+            response = {
+                ...parsedBody.Error,
+                name: `${errorCode}`,
+                message: parsedBody.Error.message || parsedBody.Error.Message || errorCode,
+                $fault: "client",
+                $metadata: deserializeMetadata(output),
+            };
+    }
+    const message = response.message || response.Message || errorCode;
+    response.message = message;
+    delete response.Message;
+    return Promise.reject(Object.assign(new Error(message), response));
+};
+const deserializeAws_queryDescribeChangeSetHooksCommand = async (output, context) => {
+    if (output.statusCode >= 300) {
+        return deserializeAws_queryDescribeChangeSetHooksCommandError(output, context);
+    }
+    const data = await parseBody(output.body, context);
+    let contents = {};
+    contents = deserializeAws_queryDescribeChangeSetHooksOutput(data.DescribeChangeSetHooksResult, context);
+    const response = {
+        $metadata: deserializeMetadata(output),
+        ...contents,
+    };
+    return Promise.resolve(response);
+};
+exports.deserializeAws_queryDescribeChangeSetHooksCommand = deserializeAws_queryDescribeChangeSetHooksCommand;
+const deserializeAws_queryDescribeChangeSetHooksCommandError = async (output, context) => {
     const parsedOutput = {
         ...output,
         body: await parseBody(output.body, context),
@@ -12744,6 +12776,22 @@ const serializeAws_queryDescribeAccountLimitsInput = (input, context) => {
     }
     return entries;
 };
+const serializeAws_queryDescribeChangeSetHooksInput = (input, context) => {
+    const entries = {};
+    if (input.ChangeSetName !== undefined && input.ChangeSetName !== null) {
+        entries["ChangeSetName"] = input.ChangeSetName;
+    }
+    if (input.StackName !== undefined && input.StackName !== null) {
+        entries["StackName"] = input.StackName;
+    }
+    if (input.NextToken !== undefined && input.NextToken !== null) {
+        entries["NextToken"] = input.NextToken;
+    }
+    if (input.LogicalResourceId !== undefined && input.LogicalResourceId !== null) {
+        entries["LogicalResourceId"] = input.LogicalResourceId;
+    }
+    return entries;
+};
 const serializeAws_queryDescribeChangeSetInput = (input, context) => {
     const entries = {};
     if (input.ChangeSetName !== undefined && input.ChangeSetName !== null) {
@@ -14241,10 +14289,14 @@ const deserializeAws_queryCFNRegistryException = (output, context) => {
 const deserializeAws_queryChange = (output, context) => {
     const contents = {
         Type: undefined,
+        HookInvocationCount: undefined,
         ResourceChange: undefined,
     };
     if (output["Type"] !== undefined) {
         contents.Type = smithy_client_1.expectString(output["Type"]);
+    }
+    if (output["HookInvocationCount"] !== undefined) {
+        contents.HookInvocationCount = smithy_client_1.strictParseInt32(output["HookInvocationCount"]);
     }
     if (output["ResourceChange"] !== undefined) {
         contents.ResourceChange = deserializeAws_queryResourceChange(output["ResourceChange"], context);
@@ -14260,6 +14312,75 @@ const deserializeAws_queryChanges = (output, context) => {
         }
         return deserializeAws_queryChange(entry, context);
     });
+};
+const deserializeAws_queryChangeSetHook = (output, context) => {
+    const contents = {
+        InvocationPoint: undefined,
+        FailureMode: undefined,
+        TypeName: undefined,
+        TypeVersionId: undefined,
+        TypeConfigurationVersionId: undefined,
+        TargetDetails: undefined,
+    };
+    if (output["InvocationPoint"] !== undefined) {
+        contents.InvocationPoint = smithy_client_1.expectString(output["InvocationPoint"]);
+    }
+    if (output["FailureMode"] !== undefined) {
+        contents.FailureMode = smithy_client_1.expectString(output["FailureMode"]);
+    }
+    if (output["TypeName"] !== undefined) {
+        contents.TypeName = smithy_client_1.expectString(output["TypeName"]);
+    }
+    if (output["TypeVersionId"] !== undefined) {
+        contents.TypeVersionId = smithy_client_1.expectString(output["TypeVersionId"]);
+    }
+    if (output["TypeConfigurationVersionId"] !== undefined) {
+        contents.TypeConfigurationVersionId = smithy_client_1.expectString(output["TypeConfigurationVersionId"]);
+    }
+    if (output["TargetDetails"] !== undefined) {
+        contents.TargetDetails = deserializeAws_queryChangeSetHookTargetDetails(output["TargetDetails"], context);
+    }
+    return contents;
+};
+const deserializeAws_queryChangeSetHookResourceTargetDetails = (output, context) => {
+    const contents = {
+        LogicalResourceId: undefined,
+        ResourceType: undefined,
+        ResourceAction: undefined,
+    };
+    if (output["LogicalResourceId"] !== undefined) {
+        contents.LogicalResourceId = smithy_client_1.expectString(output["LogicalResourceId"]);
+    }
+    if (output["ResourceType"] !== undefined) {
+        contents.ResourceType = smithy_client_1.expectString(output["ResourceType"]);
+    }
+    if (output["ResourceAction"] !== undefined) {
+        contents.ResourceAction = smithy_client_1.expectString(output["ResourceAction"]);
+    }
+    return contents;
+};
+const deserializeAws_queryChangeSetHooks = (output, context) => {
+    return (output || [])
+        .filter((e) => e != null)
+        .map((entry) => {
+        if (entry === null) {
+            return null;
+        }
+        return deserializeAws_queryChangeSetHook(entry, context);
+    });
+};
+const deserializeAws_queryChangeSetHookTargetDetails = (output, context) => {
+    const contents = {
+        TargetType: undefined,
+        ResourceTargetDetails: undefined,
+    };
+    if (output["TargetType"] !== undefined) {
+        contents.TargetType = smithy_client_1.expectString(output["TargetType"]);
+    }
+    if (output["ResourceTargetDetails"] !== undefined) {
+        contents.ResourceTargetDetails = deserializeAws_queryChangeSetHookResourceTargetDetails(output["ResourceTargetDetails"], context);
+    }
+    return contents;
 };
 const deserializeAws_queryChangeSetNotFoundException = (output, context) => {
     const contents = {
@@ -14447,6 +14568,42 @@ const deserializeAws_queryDescribeAccountLimitsOutput = (output, context) => {
     }
     if (output["NextToken"] !== undefined) {
         contents.NextToken = smithy_client_1.expectString(output["NextToken"]);
+    }
+    return contents;
+};
+const deserializeAws_queryDescribeChangeSetHooksOutput = (output, context) => {
+    const contents = {
+        ChangeSetId: undefined,
+        ChangeSetName: undefined,
+        Hooks: undefined,
+        Status: undefined,
+        NextToken: undefined,
+        StackId: undefined,
+        StackName: undefined,
+    };
+    if (output["ChangeSetId"] !== undefined) {
+        contents.ChangeSetId = smithy_client_1.expectString(output["ChangeSetId"]);
+    }
+    if (output["ChangeSetName"] !== undefined) {
+        contents.ChangeSetName = smithy_client_1.expectString(output["ChangeSetName"]);
+    }
+    if (output.Hooks === "") {
+        contents.Hooks = [];
+    }
+    if (output["Hooks"] !== undefined && output["Hooks"]["member"] !== undefined) {
+        contents.Hooks = deserializeAws_queryChangeSetHooks(smithy_client_1.getArrayIfSingleItem(output["Hooks"]["member"]), context);
+    }
+    if (output["Status"] !== undefined) {
+        contents.Status = smithy_client_1.expectString(output["Status"]);
+    }
+    if (output["NextToken"] !== undefined) {
+        contents.NextToken = smithy_client_1.expectString(output["NextToken"]);
+    }
+    if (output["StackId"] !== undefined) {
+        contents.StackId = smithy_client_1.expectString(output["StackId"]);
+    }
+    if (output["StackName"] !== undefined) {
+        contents.StackName = smithy_client_1.expectString(output["StackName"]);
     }
     return contents;
 };
@@ -15966,6 +16123,11 @@ const deserializeAws_queryStackEvent = (output, context) => {
         ResourceStatusReason: undefined,
         ResourceProperties: undefined,
         ClientRequestToken: undefined,
+        HookType: undefined,
+        HookStatus: undefined,
+        HookStatusReason: undefined,
+        HookInvocationPoint: undefined,
+        HookFailureMode: undefined,
     };
     if (output["StackId"] !== undefined) {
         contents.StackId = smithy_client_1.expectString(output["StackId"]);
@@ -15999,6 +16161,21 @@ const deserializeAws_queryStackEvent = (output, context) => {
     }
     if (output["ClientRequestToken"] !== undefined) {
         contents.ClientRequestToken = smithy_client_1.expectString(output["ClientRequestToken"]);
+    }
+    if (output["HookType"] !== undefined) {
+        contents.HookType = smithy_client_1.expectString(output["HookType"]);
+    }
+    if (output["HookStatus"] !== undefined) {
+        contents.HookStatus = smithy_client_1.expectString(output["HookStatus"]);
+    }
+    if (output["HookStatusReason"] !== undefined) {
+        contents.HookStatusReason = smithy_client_1.expectString(output["HookStatusReason"]);
+    }
+    if (output["HookInvocationPoint"] !== undefined) {
+        contents.HookInvocationPoint = smithy_client_1.expectString(output["HookInvocationPoint"]);
+    }
+    if (output["HookFailureMode"] !== undefined) {
+        contents.HookFailureMode = smithy_client_1.expectString(output["HookFailureMode"]);
     }
     return contents;
 };
@@ -17298,14 +17475,17 @@ const util_user_agent_node_1 = __nccwpck_require__(8095);
 const util_utf8_node_1 = __nccwpck_require__(6278);
 const runtimeConfig_shared_1 = __nccwpck_require__(2613);
 const smithy_client_1 = __nccwpck_require__(4963);
+const util_defaults_mode_node_1 = __nccwpck_require__(4243);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
-    smithy_client_1.emitWarningIfUnsupportedVersion(process.version);
+    const defaultsMode = util_defaults_mode_node_1.resolveDefaultsModeConfig(config);
+    const defaultConfigProvider = () => defaultsMode().then(smithy_client_1.loadConfigsForDefaultMode);
     const clientSharedValues = runtimeConfig_shared_1.getRuntimeConfig(config);
     return {
         ...clientSharedValues,
         ...config,
         runtime: "node",
+        defaultsMode,
         base64Decoder: (_a = config === null || config === void 0 ? void 0 : config.base64Decoder) !== null && _a !== void 0 ? _a : util_base64_node_1.fromBase64,
         base64Encoder: (_b = config === null || config === void 0 ? void 0 : config.base64Encoder) !== null && _b !== void 0 ? _b : util_base64_node_1.toBase64,
         bodyLengthChecker: (_c = config === null || config === void 0 ? void 0 : config.bodyLengthChecker) !== null && _c !== void 0 ? _c : util_body_length_node_1.calculateBodyLength,
@@ -17313,8 +17493,11 @@ const getRuntimeConfig = (config) => {
         defaultUserAgentProvider: (_e = config === null || config === void 0 ? void 0 : config.defaultUserAgentProvider) !== null && _e !== void 0 ? _e : util_user_agent_node_1.defaultUserAgent({ serviceId: clientSharedValues.serviceId, clientVersion: package_json_1.default.version }),
         maxAttempts: (_f = config === null || config === void 0 ? void 0 : config.maxAttempts) !== null && _f !== void 0 ? _f : node_config_provider_1.loadConfig(middleware_retry_1.NODE_MAX_ATTEMPT_CONFIG_OPTIONS),
         region: (_g = config === null || config === void 0 ? void 0 : config.region) !== null && _g !== void 0 ? _g : node_config_provider_1.loadConfig(config_resolver_1.NODE_REGION_CONFIG_OPTIONS, config_resolver_1.NODE_REGION_CONFIG_FILE_OPTIONS),
-        requestHandler: (_h = config === null || config === void 0 ? void 0 : config.requestHandler) !== null && _h !== void 0 ? _h : new node_http_handler_1.NodeHttpHandler(),
-        retryMode: (_j = config === null || config === void 0 ? void 0 : config.retryMode) !== null && _j !== void 0 ? _j : node_config_provider_1.loadConfig(middleware_retry_1.NODE_RETRY_MODE_CONFIG_OPTIONS),
+        requestHandler: (_h = config === null || config === void 0 ? void 0 : config.requestHandler) !== null && _h !== void 0 ? _h : new node_http_handler_1.NodeHttpHandler(defaultConfigProvider),
+        retryMode: (_j = config === null || config === void 0 ? void 0 : config.retryMode) !== null && _j !== void 0 ? _j : node_config_provider_1.loadConfig({
+            ...middleware_retry_1.NODE_RETRY_MODE_CONFIG_OPTIONS,
+            default: async () => (await defaultConfigProvider()).retryMode || middleware_retry_1.DEFAULT_RETRY_MODE,
+        }),
         sha256: (_k = config === null || config === void 0 ? void 0 : config.sha256) !== null && _k !== void 0 ? _k : hash_node_1.Hash.bind(null, "sha256"),
         streamCollector: (_l = config === null || config === void 0 ? void 0 : config.streamCollector) !== null && _l !== void 0 ? _l : node_http_handler_1.streamCollector,
         useDualstackEndpoint: (_m = config === null || config === void 0 ? void 0 : config.useDualstackEndpoint) !== null && _m !== void 0 ? _m : node_config_provider_1.loadConfig(config_resolver_1.NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS),
@@ -18548,6 +18731,15 @@ const regionHash = {
         ],
         signingRegion: "us-east-2",
     },
+    "us-gov-east-1": {
+        variants: [
+            {
+                hostname: "portal.sso.us-gov-east-1.amazonaws.com",
+                tags: [],
+            },
+        ],
+        signingRegion: "us-gov-east-1",
+    },
     "us-gov-west-1": {
         variants: [
             {
@@ -18578,6 +18770,7 @@ const partitionHash = {
             "ap-south-1",
             "ap-southeast-1",
             "ap-southeast-2",
+            "ap-southeast-3",
             "ca-central-1",
             "eu-central-1",
             "eu-north-1",
@@ -18727,7 +18920,7 @@ tslib_1.__exportStar(__nccwpck_require__(6390), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.LogoutRequest = exports.ListAccountsResponse = exports.ListAccountsRequest = exports.ListAccountRolesResponse = exports.RoleInfo = exports.ListAccountRolesRequest = exports.UnauthorizedException = exports.TooManyRequestsException = exports.ResourceNotFoundException = exports.InvalidRequestException = exports.GetRoleCredentialsResponse = exports.RoleCredentials = exports.GetRoleCredentialsRequest = exports.AccountInfo = void 0;
+exports.LogoutRequest = exports.ListAccountsResponse = exports.ListAccountsRequest = exports.ListAccountRolesResponse = exports.RoleInfo = exports.ListAccountRolesRequest = exports.GetRoleCredentialsResponse = exports.RoleCredentials = exports.GetRoleCredentialsRequest = exports.AccountInfo = void 0;
 const smithy_client_1 = __nccwpck_require__(4963);
 var AccountInfo;
 (function (AccountInfo) {
@@ -18757,30 +18950,6 @@ var GetRoleCredentialsResponse;
         ...(obj.roleCredentials && { roleCredentials: RoleCredentials.filterSensitiveLog(obj.roleCredentials) }),
     });
 })(GetRoleCredentialsResponse = exports.GetRoleCredentialsResponse || (exports.GetRoleCredentialsResponse = {}));
-var InvalidRequestException;
-(function (InvalidRequestException) {
-    InvalidRequestException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InvalidRequestException = exports.InvalidRequestException || (exports.InvalidRequestException = {}));
-var ResourceNotFoundException;
-(function (ResourceNotFoundException) {
-    ResourceNotFoundException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(ResourceNotFoundException = exports.ResourceNotFoundException || (exports.ResourceNotFoundException = {}));
-var TooManyRequestsException;
-(function (TooManyRequestsException) {
-    TooManyRequestsException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(TooManyRequestsException = exports.TooManyRequestsException || (exports.TooManyRequestsException = {}));
-var UnauthorizedException;
-(function (UnauthorizedException) {
-    UnauthorizedException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(UnauthorizedException = exports.UnauthorizedException || (exports.UnauthorizedException = {}));
 var ListAccountRolesRequest;
 (function (ListAccountRolesRequest) {
     ListAccountRolesRequest.filterSensitiveLog = (obj) => ({
@@ -19477,22 +19646,28 @@ const util_user_agent_node_1 = __nccwpck_require__(8095);
 const util_utf8_node_1 = __nccwpck_require__(6278);
 const runtimeConfig_shared_1 = __nccwpck_require__(4355);
 const smithy_client_1 = __nccwpck_require__(4963);
+const util_defaults_mode_node_1 = __nccwpck_require__(4243);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-    smithy_client_1.emitWarningIfUnsupportedVersion(process.version);
+    const defaultsMode = util_defaults_mode_node_1.resolveDefaultsModeConfig(config);
+    const defaultConfigProvider = () => defaultsMode().then(smithy_client_1.loadConfigsForDefaultMode);
     const clientSharedValues = runtimeConfig_shared_1.getRuntimeConfig(config);
     return {
         ...clientSharedValues,
         ...config,
         runtime: "node",
+        defaultsMode,
         base64Decoder: (_a = config === null || config === void 0 ? void 0 : config.base64Decoder) !== null && _a !== void 0 ? _a : util_base64_node_1.fromBase64,
         base64Encoder: (_b = config === null || config === void 0 ? void 0 : config.base64Encoder) !== null && _b !== void 0 ? _b : util_base64_node_1.toBase64,
         bodyLengthChecker: (_c = config === null || config === void 0 ? void 0 : config.bodyLengthChecker) !== null && _c !== void 0 ? _c : util_body_length_node_1.calculateBodyLength,
         defaultUserAgentProvider: (_d = config === null || config === void 0 ? void 0 : config.defaultUserAgentProvider) !== null && _d !== void 0 ? _d : util_user_agent_node_1.defaultUserAgent({ serviceId: clientSharedValues.serviceId, clientVersion: package_json_1.default.version }),
         maxAttempts: (_e = config === null || config === void 0 ? void 0 : config.maxAttempts) !== null && _e !== void 0 ? _e : node_config_provider_1.loadConfig(middleware_retry_1.NODE_MAX_ATTEMPT_CONFIG_OPTIONS),
         region: (_f = config === null || config === void 0 ? void 0 : config.region) !== null && _f !== void 0 ? _f : node_config_provider_1.loadConfig(config_resolver_1.NODE_REGION_CONFIG_OPTIONS, config_resolver_1.NODE_REGION_CONFIG_FILE_OPTIONS),
-        requestHandler: (_g = config === null || config === void 0 ? void 0 : config.requestHandler) !== null && _g !== void 0 ? _g : new node_http_handler_1.NodeHttpHandler(),
-        retryMode: (_h = config === null || config === void 0 ? void 0 : config.retryMode) !== null && _h !== void 0 ? _h : node_config_provider_1.loadConfig(middleware_retry_1.NODE_RETRY_MODE_CONFIG_OPTIONS),
+        requestHandler: (_g = config === null || config === void 0 ? void 0 : config.requestHandler) !== null && _g !== void 0 ? _g : new node_http_handler_1.NodeHttpHandler(defaultConfigProvider),
+        retryMode: (_h = config === null || config === void 0 ? void 0 : config.retryMode) !== null && _h !== void 0 ? _h : node_config_provider_1.loadConfig({
+            ...middleware_retry_1.NODE_RETRY_MODE_CONFIG_OPTIONS,
+            default: async () => (await defaultConfigProvider()).retryMode || middleware_retry_1.DEFAULT_RETRY_MODE,
+        }),
         sha256: (_j = config === null || config === void 0 ? void 0 : config.sha256) !== null && _j !== void 0 ? _j : hash_node_1.Hash.bind(null, "sha256"),
         streamCollector: (_k = config === null || config === void 0 ? void 0 : config.streamCollector) !== null && _k !== void 0 ? _k : node_http_handler_1.streamCollector,
         useDualstackEndpoint: (_l = config === null || config === void 0 ? void 0 : config.useDualstackEndpoint) !== null && _l !== void 0 ? _l : node_config_provider_1.loadConfig(config_resolver_1.NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS),
@@ -20204,10 +20379,6 @@ const regionHash = {
     "us-east-1": {
         variants: [
             {
-                hostname: "sts.us-east-1.amazonaws.com",
-                tags: [],
-            },
-            {
                 hostname: "sts-fips.us-east-1.amazonaws.com",
                 tags: ["fips"],
             },
@@ -20215,10 +20386,6 @@ const regionHash = {
     },
     "us-east-2": {
         variants: [
-            {
-                hostname: "sts.us-east-2.amazonaws.com",
-                tags: [],
-            },
             {
                 hostname: "sts-fips.us-east-2.amazonaws.com",
                 tags: ["fips"],
@@ -20229,20 +20396,12 @@ const regionHash = {
         variants: [
             {
                 hostname: "sts.us-gov-east-1.amazonaws.com",
-                tags: [],
-            },
-            {
-                hostname: "sts.us-gov-east-1.amazonaws.com",
                 tags: ["fips"],
             },
         ],
     },
     "us-gov-west-1": {
         variants: [
-            {
-                hostname: "sts.us-gov-west-1.amazonaws.com",
-                tags: [],
-            },
             {
                 hostname: "sts.us-gov-west-1.amazonaws.com",
                 tags: ["fips"],
@@ -20252,10 +20411,6 @@ const regionHash = {
     "us-west-1": {
         variants: [
             {
-                hostname: "sts.us-west-1.amazonaws.com",
-                tags: [],
-            },
-            {
                 hostname: "sts-fips.us-west-1.amazonaws.com",
                 tags: ["fips"],
             },
@@ -20263,10 +20418,6 @@ const regionHash = {
     },
     "us-west-2": {
         variants: [
-            {
-                hostname: "sts.us-west-2.amazonaws.com",
-                tags: [],
-            },
             {
                 hostname: "sts-fips.us-west-2.amazonaws.com",
                 tags: ["fips"],
@@ -20285,6 +20436,7 @@ const partitionHash = {
             "ap-south-1",
             "ap-southeast-1",
             "ap-southeast-2",
+            "ap-southeast-3",
             "aws-global",
             "ca-central-1",
             "eu-central-1",
@@ -20439,7 +20591,7 @@ tslib_1.__exportStar(__nccwpck_require__(1780), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GetSessionTokenResponse = exports.GetSessionTokenRequest = exports.GetFederationTokenResponse = exports.FederatedUser = exports.GetFederationTokenRequest = exports.GetCallerIdentityResponse = exports.GetCallerIdentityRequest = exports.GetAccessKeyInfoResponse = exports.GetAccessKeyInfoRequest = exports.InvalidAuthorizationMessageException = exports.DecodeAuthorizationMessageResponse = exports.DecodeAuthorizationMessageRequest = exports.IDPCommunicationErrorException = exports.AssumeRoleWithWebIdentityResponse = exports.AssumeRoleWithWebIdentityRequest = exports.InvalidIdentityTokenException = exports.IDPRejectedClaimException = exports.AssumeRoleWithSAMLResponse = exports.AssumeRoleWithSAMLRequest = exports.RegionDisabledException = exports.PackedPolicyTooLargeException = exports.MalformedPolicyDocumentException = exports.ExpiredTokenException = exports.AssumeRoleResponse = exports.Credentials = exports.AssumeRoleRequest = exports.Tag = exports.PolicyDescriptorType = exports.AssumedRoleUser = void 0;
+exports.GetSessionTokenResponse = exports.GetSessionTokenRequest = exports.GetFederationTokenResponse = exports.FederatedUser = exports.GetFederationTokenRequest = exports.GetCallerIdentityResponse = exports.GetCallerIdentityRequest = exports.GetAccessKeyInfoResponse = exports.GetAccessKeyInfoRequest = exports.DecodeAuthorizationMessageResponse = exports.DecodeAuthorizationMessageRequest = exports.AssumeRoleWithWebIdentityResponse = exports.AssumeRoleWithWebIdentityRequest = exports.AssumeRoleWithSAMLResponse = exports.AssumeRoleWithSAMLRequest = exports.AssumeRoleResponse = exports.Credentials = exports.AssumeRoleRequest = exports.Tag = exports.PolicyDescriptorType = exports.AssumedRoleUser = void 0;
 var AssumedRoleUser;
 (function (AssumedRoleUser) {
     AssumedRoleUser.filterSensitiveLog = (obj) => ({
@@ -20476,30 +20628,6 @@ var AssumeRoleResponse;
         ...obj,
     });
 })(AssumeRoleResponse = exports.AssumeRoleResponse || (exports.AssumeRoleResponse = {}));
-var ExpiredTokenException;
-(function (ExpiredTokenException) {
-    ExpiredTokenException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(ExpiredTokenException = exports.ExpiredTokenException || (exports.ExpiredTokenException = {}));
-var MalformedPolicyDocumentException;
-(function (MalformedPolicyDocumentException) {
-    MalformedPolicyDocumentException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(MalformedPolicyDocumentException = exports.MalformedPolicyDocumentException || (exports.MalformedPolicyDocumentException = {}));
-var PackedPolicyTooLargeException;
-(function (PackedPolicyTooLargeException) {
-    PackedPolicyTooLargeException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(PackedPolicyTooLargeException = exports.PackedPolicyTooLargeException || (exports.PackedPolicyTooLargeException = {}));
-var RegionDisabledException;
-(function (RegionDisabledException) {
-    RegionDisabledException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(RegionDisabledException = exports.RegionDisabledException || (exports.RegionDisabledException = {}));
 var AssumeRoleWithSAMLRequest;
 (function (AssumeRoleWithSAMLRequest) {
     AssumeRoleWithSAMLRequest.filterSensitiveLog = (obj) => ({
@@ -20512,18 +20640,6 @@ var AssumeRoleWithSAMLResponse;
         ...obj,
     });
 })(AssumeRoleWithSAMLResponse = exports.AssumeRoleWithSAMLResponse || (exports.AssumeRoleWithSAMLResponse = {}));
-var IDPRejectedClaimException;
-(function (IDPRejectedClaimException) {
-    IDPRejectedClaimException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(IDPRejectedClaimException = exports.IDPRejectedClaimException || (exports.IDPRejectedClaimException = {}));
-var InvalidIdentityTokenException;
-(function (InvalidIdentityTokenException) {
-    InvalidIdentityTokenException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InvalidIdentityTokenException = exports.InvalidIdentityTokenException || (exports.InvalidIdentityTokenException = {}));
 var AssumeRoleWithWebIdentityRequest;
 (function (AssumeRoleWithWebIdentityRequest) {
     AssumeRoleWithWebIdentityRequest.filterSensitiveLog = (obj) => ({
@@ -20536,12 +20652,6 @@ var AssumeRoleWithWebIdentityResponse;
         ...obj,
     });
 })(AssumeRoleWithWebIdentityResponse = exports.AssumeRoleWithWebIdentityResponse || (exports.AssumeRoleWithWebIdentityResponse = {}));
-var IDPCommunicationErrorException;
-(function (IDPCommunicationErrorException) {
-    IDPCommunicationErrorException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(IDPCommunicationErrorException = exports.IDPCommunicationErrorException || (exports.IDPCommunicationErrorException = {}));
 var DecodeAuthorizationMessageRequest;
 (function (DecodeAuthorizationMessageRequest) {
     DecodeAuthorizationMessageRequest.filterSensitiveLog = (obj) => ({
@@ -20554,12 +20664,6 @@ var DecodeAuthorizationMessageResponse;
         ...obj,
     });
 })(DecodeAuthorizationMessageResponse = exports.DecodeAuthorizationMessageResponse || (exports.DecodeAuthorizationMessageResponse = {}));
-var InvalidAuthorizationMessageException;
-(function (InvalidAuthorizationMessageException) {
-    InvalidAuthorizationMessageException.filterSensitiveLog = (obj) => ({
-        ...obj,
-    });
-})(InvalidAuthorizationMessageException = exports.InvalidAuthorizationMessageException || (exports.InvalidAuthorizationMessageException = {}));
 var GetAccessKeyInfoRequest;
 (function (GetAccessKeyInfoRequest) {
     GetAccessKeyInfoRequest.filterSensitiveLog = (obj) => ({
@@ -21895,14 +21999,17 @@ const util_user_agent_node_1 = __nccwpck_require__(8095);
 const util_utf8_node_1 = __nccwpck_require__(6278);
 const runtimeConfig_shared_1 = __nccwpck_require__(2642);
 const smithy_client_1 = __nccwpck_require__(4963);
+const util_defaults_mode_node_1 = __nccwpck_require__(4243);
 const getRuntimeConfig = (config) => {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
-    smithy_client_1.emitWarningIfUnsupportedVersion(process.version);
+    const defaultsMode = util_defaults_mode_node_1.resolveDefaultsModeConfig(config);
+    const defaultConfigProvider = () => defaultsMode().then(smithy_client_1.loadConfigsForDefaultMode);
     const clientSharedValues = runtimeConfig_shared_1.getRuntimeConfig(config);
     return {
         ...clientSharedValues,
         ...config,
         runtime: "node",
+        defaultsMode,
         base64Decoder: (_a = config === null || config === void 0 ? void 0 : config.base64Decoder) !== null && _a !== void 0 ? _a : util_base64_node_1.fromBase64,
         base64Encoder: (_b = config === null || config === void 0 ? void 0 : config.base64Encoder) !== null && _b !== void 0 ? _b : util_base64_node_1.toBase64,
         bodyLengthChecker: (_c = config === null || config === void 0 ? void 0 : config.bodyLengthChecker) !== null && _c !== void 0 ? _c : util_body_length_node_1.calculateBodyLength,
@@ -21910,8 +22017,11 @@ const getRuntimeConfig = (config) => {
         defaultUserAgentProvider: (_e = config === null || config === void 0 ? void 0 : config.defaultUserAgentProvider) !== null && _e !== void 0 ? _e : util_user_agent_node_1.defaultUserAgent({ serviceId: clientSharedValues.serviceId, clientVersion: package_json_1.default.version }),
         maxAttempts: (_f = config === null || config === void 0 ? void 0 : config.maxAttempts) !== null && _f !== void 0 ? _f : node_config_provider_1.loadConfig(middleware_retry_1.NODE_MAX_ATTEMPT_CONFIG_OPTIONS),
         region: (_g = config === null || config === void 0 ? void 0 : config.region) !== null && _g !== void 0 ? _g : node_config_provider_1.loadConfig(config_resolver_1.NODE_REGION_CONFIG_OPTIONS, config_resolver_1.NODE_REGION_CONFIG_FILE_OPTIONS),
-        requestHandler: (_h = config === null || config === void 0 ? void 0 : config.requestHandler) !== null && _h !== void 0 ? _h : new node_http_handler_1.NodeHttpHandler(),
-        retryMode: (_j = config === null || config === void 0 ? void 0 : config.retryMode) !== null && _j !== void 0 ? _j : node_config_provider_1.loadConfig(middleware_retry_1.NODE_RETRY_MODE_CONFIG_OPTIONS),
+        requestHandler: (_h = config === null || config === void 0 ? void 0 : config.requestHandler) !== null && _h !== void 0 ? _h : new node_http_handler_1.NodeHttpHandler(defaultConfigProvider),
+        retryMode: (_j = config === null || config === void 0 ? void 0 : config.retryMode) !== null && _j !== void 0 ? _j : node_config_provider_1.loadConfig({
+            ...middleware_retry_1.NODE_RETRY_MODE_CONFIG_OPTIONS,
+            default: async () => (await defaultConfigProvider()).retryMode || middleware_retry_1.DEFAULT_RETRY_MODE,
+        }),
         sha256: (_k = config === null || config === void 0 ? void 0 : config.sha256) !== null && _k !== void 0 ? _k : hash_node_1.Hash.bind(null, "sha256"),
         streamCollector: (_l = config === null || config === void 0 ? void 0 : config.streamCollector) !== null && _l !== void 0 ? _l : node_http_handler_1.streamCollector,
         useDualstackEndpoint: (_m = config === null || config === void 0 ? void 0 : config.useDualstackEndpoint) !== null && _m !== void 0 ? _m : node_config_provider_1.loadConfig(config_resolver_1.NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS),
@@ -22369,7 +22479,7 @@ tslib_1.__exportStar(__nccwpck_require__(6167), exports);
 
 /***/ }),
 
-/***/ 5972:
+/***/ 255:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
@@ -22380,23 +22490,33 @@ exports.ENV_KEY = "AWS_ACCESS_KEY_ID";
 exports.ENV_SECRET = "AWS_SECRET_ACCESS_KEY";
 exports.ENV_SESSION = "AWS_SESSION_TOKEN";
 exports.ENV_EXPIRATION = "AWS_CREDENTIAL_EXPIRATION";
-function fromEnv() {
-    return () => {
-        const accessKeyId = process.env[exports.ENV_KEY];
-        const secretAccessKey = process.env[exports.ENV_SECRET];
-        const expiry = process.env[exports.ENV_EXPIRATION];
-        if (accessKeyId && secretAccessKey) {
-            return Promise.resolve({
-                accessKeyId,
-                secretAccessKey,
-                sessionToken: process.env[exports.ENV_SESSION],
-                expiration: expiry ? new Date(expiry) : undefined,
-            });
-        }
-        return Promise.reject(new property_provider_1.CredentialsProviderError("Unable to find environment variable credentials."));
-    };
-}
+const fromEnv = () => async () => {
+    const accessKeyId = process.env[exports.ENV_KEY];
+    const secretAccessKey = process.env[exports.ENV_SECRET];
+    const sessionToken = process.env[exports.ENV_SESSION];
+    const expiry = process.env[exports.ENV_EXPIRATION];
+    if (accessKeyId && secretAccessKey) {
+        return {
+            accessKeyId,
+            secretAccessKey,
+            ...(sessionToken && { sessionToken }),
+            ...(expiry && { expiration: new Date(expiry) }),
+        };
+    }
+    throw new property_provider_1.CredentialsProviderError("Unable to find environment variable credentials.");
+};
 exports.fromEnv = fromEnv;
+
+
+/***/ }),
+
+/***/ 5972:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(255), exports);
 
 
 /***/ }),
@@ -22648,10 +22768,15 @@ const getCredentialsFromProfile = async (profile, options) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getInstanceMetadataEndpoint = exports.httpRequest = void 0;
 const tslib_1 = __nccwpck_require__(4351);
 tslib_1.__exportStar(__nccwpck_require__(5232), exports);
 tslib_1.__exportStar(__nccwpck_require__(5813), exports);
 tslib_1.__exportStar(__nccwpck_require__(2314), exports);
+var httpRequest_1 = __nccwpck_require__(1303);
+Object.defineProperty(exports, "httpRequest", ({ enumerable: true, get: function () { return httpRequest_1.httpRequest; } }));
+var getInstanceMetadataEndpoint_1 = __nccwpck_require__(1206);
+Object.defineProperty(exports, "getInstanceMetadataEndpoint", ({ enumerable: true, get: function () { return getInstanceMetadataEndpoint_1.getInstanceMetadataEndpoint; } }));
 
 
 /***/ }),
@@ -22790,89 +22915,101 @@ const getFromEndpointModeConfig = async () => {
 
 /***/ }),
 
-/***/ 4203:
+/***/ 5442:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fromIni = void 0;
-const credential_provider_env_1 = __nccwpck_require__(5972);
-const credential_provider_imds_1 = __nccwpck_require__(5898);
-const credential_provider_sso_1 = __nccwpck_require__(6414);
-const credential_provider_web_identity_1 = __nccwpck_require__(5646);
+const util_credentials_1 = __nccwpck_require__(8598);
+const resolveProfileData_1 = __nccwpck_require__(5653);
+const fromIni = (init = {}) => async () => {
+    const profiles = await util_credentials_1.parseKnownFiles(init);
+    return resolveProfileData_1.resolveProfileData(util_credentials_1.getMasterProfileName(init), profiles, init);
+};
+exports.fromIni = fromIni;
+
+
+/***/ }),
+
+/***/ 4203:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(5442), exports);
+
+
+/***/ }),
+
+/***/ 853:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveAssumeRoleCredentials = exports.isAssumeRoleProfile = void 0;
 const property_provider_1 = __nccwpck_require__(4462);
 const util_credentials_1 = __nccwpck_require__(8598);
-const isStaticCredsProfile = (arg) => Boolean(arg) &&
-    typeof arg === "object" &&
-    typeof arg.aws_access_key_id === "string" &&
-    typeof arg.aws_secret_access_key === "string" &&
-    ["undefined", "string"].indexOf(typeof arg.aws_session_token) > -1;
-const isWebIdentityProfile = (arg) => Boolean(arg) &&
-    typeof arg === "object" &&
-    typeof arg.web_identity_token_file === "string" &&
-    typeof arg.role_arn === "string" &&
-    ["undefined", "string"].indexOf(typeof arg.role_session_name) > -1;
+const resolveCredentialSource_1 = __nccwpck_require__(2458);
+const resolveProfileData_1 = __nccwpck_require__(5653);
 const isAssumeRoleProfile = (arg) => Boolean(arg) &&
     typeof arg === "object" &&
     typeof arg.role_arn === "string" &&
     ["undefined", "string"].indexOf(typeof arg.role_session_name) > -1 &&
     ["undefined", "string"].indexOf(typeof arg.external_id) > -1 &&
-    ["undefined", "string"].indexOf(typeof arg.mfa_serial) > -1;
-const isAssumeRoleWithSourceProfile = (arg) => isAssumeRoleProfile(arg) && typeof arg.source_profile === "string" && typeof arg.credential_source === "undefined";
-const isAssumeRoleWithProviderProfile = (arg) => isAssumeRoleProfile(arg) && typeof arg.credential_source === "string" && typeof arg.source_profile === "undefined";
-const fromIni = (init = {}) => async () => {
-    const profiles = await util_credentials_1.parseKnownFiles(init);
-    return resolveProfileData(util_credentials_1.getMasterProfileName(init), profiles, init);
-};
-exports.fromIni = fromIni;
-const resolveProfileData = async (profileName, profiles, options, visitedProfiles = {}) => {
+    ["undefined", "string"].indexOf(typeof arg.mfa_serial) > -1 &&
+    (isAssumeRoleWithSourceProfile(arg) || isAssumeRoleWithProviderProfile(arg));
+exports.isAssumeRoleProfile = isAssumeRoleProfile;
+const isAssumeRoleWithSourceProfile = (arg) => typeof arg.source_profile === "string" && typeof arg.credential_source === "undefined";
+const isAssumeRoleWithProviderProfile = (arg) => typeof arg.credential_source === "string" && typeof arg.source_profile === "undefined";
+const resolveAssumeRoleCredentials = async (profileName, profiles, options, visitedProfiles = {}) => {
     const data = profiles[profileName];
-    if (Object.keys(visitedProfiles).length > 0 && isStaticCredsProfile(data)) {
-        return resolveStaticCredentials(data);
+    if (!options.roleAssumer) {
+        throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} requires a role to be assumed, but no role assumption callback was provided.`, false);
     }
-    if (isAssumeRoleWithSourceProfile(data) || isAssumeRoleWithProviderProfile(data)) {
-        const { external_id: ExternalId, mfa_serial, role_arn: RoleArn, role_session_name: RoleSessionName = "aws-sdk-js-" + Date.now(), source_profile, credential_source, } = data;
-        if (!options.roleAssumer) {
-            throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} requires a role to be assumed, but no` + ` role assumption callback was provided.`, false);
+    const { source_profile } = data;
+    if (source_profile && source_profile in visitedProfiles) {
+        throw new property_provider_1.CredentialsProviderError(`Detected a cycle attempting to resolve credentials for profile` +
+            ` ${util_credentials_1.getMasterProfileName(options)}. Profiles visited: ` +
+            Object.keys(visitedProfiles).join(", "), false);
+    }
+    const sourceCredsProvider = source_profile
+        ? resolveProfileData_1.resolveProfileData(source_profile, profiles, options, {
+            ...visitedProfiles,
+            [source_profile]: true,
+        })
+        : resolveCredentialSource_1.resolveCredentialSource(data.credential_source, profileName)();
+    const params = {
+        RoleArn: data.role_arn,
+        RoleSessionName: data.role_session_name || `aws-sdk-js-${Date.now()}`,
+        ExternalId: data.external_id,
+    };
+    const { mfa_serial } = data;
+    if (mfa_serial) {
+        if (!options.mfaCodeProvider) {
+            throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} requires multi-factor authentication, but no MFA code callback was provided.`, false);
         }
-        if (source_profile && source_profile in visitedProfiles) {
-            throw new property_provider_1.CredentialsProviderError(`Detected a cycle attempting to resolve credentials for profile` +
-                ` ${util_credentials_1.getMasterProfileName(options)}. Profiles visited: ` +
-                Object.keys(visitedProfiles).join(", "), false);
-        }
-        const sourceCreds = source_profile
-            ? resolveProfileData(source_profile, profiles, options, {
-                ...visitedProfiles,
-                [source_profile]: true,
-            })
-            : resolveCredentialSource(credential_source, profileName)();
-        const params = { RoleArn, RoleSessionName, ExternalId };
-        if (mfa_serial) {
-            if (!options.mfaCodeProvider) {
-                throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} requires multi-factor authentication,` + ` but no MFA code callback was provided.`, false);
-            }
-            params.SerialNumber = mfa_serial;
-            params.TokenCode = await options.mfaCodeProvider(mfa_serial);
-        }
-        return options.roleAssumer(await sourceCreds, params);
+        params.SerialNumber = mfa_serial;
+        params.TokenCode = await options.mfaCodeProvider(mfa_serial);
     }
-    if (isStaticCredsProfile(data)) {
-        return resolveStaticCredentials(data);
-    }
-    if (isWebIdentityProfile(data)) {
-        return resolveWebIdentityCredentials(data, options);
-    }
-    if (credential_provider_sso_1.isSsoProfile(data)) {
-        const { sso_start_url, sso_account_id, sso_region, sso_role_name } = credential_provider_sso_1.validateSsoProfile(data);
-        return credential_provider_sso_1.fromSSO({
-            ssoStartUrl: sso_start_url,
-            ssoAccountId: sso_account_id,
-            ssoRegion: sso_region,
-            ssoRoleName: sso_role_name,
-        })();
-    }
-    throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} could not be found or parsed in shared` + ` credentials file.`);
+    const sourceCreds = await sourceCredsProvider;
+    return options.roleAssumer(sourceCreds, params);
 };
+exports.resolveAssumeRoleCredentials = resolveAssumeRoleCredentials;
+
+
+/***/ }),
+
+/***/ 2458:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveCredentialSource = void 0;
+const credential_provider_env_1 = __nccwpck_require__(5972);
+const credential_provider_imds_1 = __nccwpck_require__(5898);
+const property_provider_1 = __nccwpck_require__(4462);
 const resolveCredentialSource = (credentialSource, profileName) => {
     const sourceProvidersMap = {
         EcsContainer: credential_provider_imds_1.fromContainerMetadata,
@@ -22887,17 +23024,142 @@ const resolveCredentialSource = (credentialSource, profileName) => {
             `expected EcsContainer or Ec2InstanceMetadata or Environment.`);
     }
 };
+exports.resolveCredentialSource = resolveCredentialSource;
+
+
+/***/ }),
+
+/***/ 5653:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveProfileData = void 0;
+const property_provider_1 = __nccwpck_require__(4462);
+const resolveAssumeRoleCredentials_1 = __nccwpck_require__(853);
+const resolveSsoCredentials_1 = __nccwpck_require__(9867);
+const resolveStaticCredentials_1 = __nccwpck_require__(3071);
+const resolveWebIdentityCredentials_1 = __nccwpck_require__(8342);
+const resolveProfileData = async (profileName, profiles, options, visitedProfiles = {}) => {
+    const data = profiles[profileName];
+    if (Object.keys(visitedProfiles).length > 0 && resolveStaticCredentials_1.isStaticCredsProfile(data)) {
+        return resolveStaticCredentials_1.resolveStaticCredentials(data);
+    }
+    if (resolveAssumeRoleCredentials_1.isAssumeRoleProfile(data)) {
+        return resolveAssumeRoleCredentials_1.resolveAssumeRoleCredentials(profileName, profiles, options, visitedProfiles);
+    }
+    if (resolveStaticCredentials_1.isStaticCredsProfile(data)) {
+        return resolveStaticCredentials_1.resolveStaticCredentials(data);
+    }
+    if (resolveWebIdentityCredentials_1.isWebIdentityProfile(data)) {
+        return resolveWebIdentityCredentials_1.resolveWebIdentityCredentials(data, options);
+    }
+    if (resolveSsoCredentials_1.isSsoProfile(data)) {
+        return resolveSsoCredentials_1.resolveSsoCredentials(data);
+    }
+    throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} could not be found or parsed in shared credentials file.`);
+};
+exports.resolveProfileData = resolveProfileData;
+
+
+/***/ }),
+
+/***/ 9867:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveSsoCredentials = exports.isSsoProfile = void 0;
+const credential_provider_sso_1 = __nccwpck_require__(6414);
+var credential_provider_sso_2 = __nccwpck_require__(6414);
+Object.defineProperty(exports, "isSsoProfile", ({ enumerable: true, get: function () { return credential_provider_sso_2.isSsoProfile; } }));
+const resolveSsoCredentials = (data) => {
+    const { sso_start_url, sso_account_id, sso_region, sso_role_name } = credential_provider_sso_1.validateSsoProfile(data);
+    return credential_provider_sso_1.fromSSO({
+        ssoStartUrl: sso_start_url,
+        ssoAccountId: sso_account_id,
+        ssoRegion: sso_region,
+        ssoRoleName: sso_role_name,
+    })();
+};
+exports.resolveSsoCredentials = resolveSsoCredentials;
+
+
+/***/ }),
+
+/***/ 3071:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveStaticCredentials = exports.isStaticCredsProfile = void 0;
+const isStaticCredsProfile = (arg) => Boolean(arg) &&
+    typeof arg === "object" &&
+    typeof arg.aws_access_key_id === "string" &&
+    typeof arg.aws_secret_access_key === "string" &&
+    ["undefined", "string"].indexOf(typeof arg.aws_session_token) > -1;
+exports.isStaticCredsProfile = isStaticCredsProfile;
 const resolveStaticCredentials = (profile) => Promise.resolve({
     accessKeyId: profile.aws_access_key_id,
     secretAccessKey: profile.aws_secret_access_key,
     sessionToken: profile.aws_session_token,
 });
+exports.resolveStaticCredentials = resolveStaticCredentials;
+
+
+/***/ }),
+
+/***/ 8342:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveWebIdentityCredentials = exports.isWebIdentityProfile = void 0;
+const credential_provider_web_identity_1 = __nccwpck_require__(5646);
+const isWebIdentityProfile = (arg) => Boolean(arg) &&
+    typeof arg === "object" &&
+    typeof arg.web_identity_token_file === "string" &&
+    typeof arg.role_arn === "string" &&
+    ["undefined", "string"].indexOf(typeof arg.role_session_name) > -1;
+exports.isWebIdentityProfile = isWebIdentityProfile;
 const resolveWebIdentityCredentials = async (profile, options) => credential_provider_web_identity_1.fromTokenFile({
     webIdentityTokenFile: profile.web_identity_token_file,
     roleArn: profile.role_arn,
     roleSessionName: profile.role_session_name,
     roleAssumerWithWebIdentity: options.roleAssumerWithWebIdentity,
 })();
+exports.resolveWebIdentityCredentials = resolveWebIdentityCredentials;
+
+
+/***/ }),
+
+/***/ 5560:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.defaultProvider = void 0;
+const credential_provider_env_1 = __nccwpck_require__(5972);
+const credential_provider_ini_1 = __nccwpck_require__(4203);
+const credential_provider_process_1 = __nccwpck_require__(9969);
+const credential_provider_sso_1 = __nccwpck_require__(6414);
+const credential_provider_web_identity_1 = __nccwpck_require__(5646);
+const property_provider_1 = __nccwpck_require__(4462);
+const shared_ini_file_loader_1 = __nccwpck_require__(7387);
+const util_credentials_1 = __nccwpck_require__(8598);
+const remoteProvider_1 = __nccwpck_require__(626);
+const defaultProvider = (init = {}) => {
+    const options = {
+        profile: process.env[util_credentials_1.ENV_PROFILE],
+        ...init,
+        ...(!init.loadedConfig && { loadedConfig: shared_ini_file_loader_1.loadSharedConfigFiles(init) }),
+    };
+    const providerChain = property_provider_1.chain(...(options.profile ? [] : [credential_provider_env_1.fromEnv()]), credential_provider_sso_1.fromSSO(options), credential_provider_ini_1.fromIni(options), credential_provider_process_1.fromProcess(options), credential_provider_web_identity_1.fromTokenFile(options), remoteProvider_1.remoteProvider(options), async () => {
+        throw new property_provider_1.CredentialsProviderError("Could not load credentials from any providers", false);
+    });
+    return property_provider_1.memoize(providerChain, (credentials) => credentials.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000, (credentials) => credentials.expiration !== undefined);
+};
+exports.defaultProvider = defaultProvider;
 
 
 /***/ }),
@@ -22907,46 +23169,82 @@ const resolveWebIdentityCredentials = async (profile, options) => credential_pro
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.defaultProvider = exports.ENV_IMDS_DISABLED = void 0;
-const credential_provider_env_1 = __nccwpck_require__(5972);
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(5560), exports);
+
+
+/***/ }),
+
+/***/ 626:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.remoteProvider = exports.ENV_IMDS_DISABLED = void 0;
 const credential_provider_imds_1 = __nccwpck_require__(5898);
-const credential_provider_ini_1 = __nccwpck_require__(4203);
-const credential_provider_process_1 = __nccwpck_require__(9969);
-const credential_provider_sso_1 = __nccwpck_require__(6414);
-const credential_provider_web_identity_1 = __nccwpck_require__(5646);
 const property_provider_1 = __nccwpck_require__(4462);
-const shared_ini_file_loader_1 = __nccwpck_require__(7387);
-const util_credentials_1 = __nccwpck_require__(8598);
 exports.ENV_IMDS_DISABLED = "AWS_EC2_METADATA_DISABLED";
-const defaultProvider = (init = {}) => {
-    const options = { profile: process.env[util_credentials_1.ENV_PROFILE], ...init };
-    if (!options.loadedConfig)
-        options.loadedConfig = shared_ini_file_loader_1.loadSharedConfigFiles(init);
-    const providers = [
-        credential_provider_sso_1.fromSSO(options),
-        credential_provider_ini_1.fromIni(options),
-        credential_provider_process_1.fromProcess(options),
-        credential_provider_web_identity_1.fromTokenFile(options),
-        remoteProvider(options),
-        async () => {
-            throw new property_provider_1.CredentialsProviderError("Could not load credentials from any providers", false);
-        },
-    ];
-    if (!options.profile)
-        providers.unshift(credential_provider_env_1.fromEnv());
-    const providerChain = property_provider_1.chain(...providers);
-    return property_provider_1.memoize(providerChain, (credentials) => credentials.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000, (credentials) => credentials.expiration !== undefined);
-};
-exports.defaultProvider = defaultProvider;
 const remoteProvider = (init) => {
     if (process.env[credential_provider_imds_1.ENV_CMDS_RELATIVE_URI] || process.env[credential_provider_imds_1.ENV_CMDS_FULL_URI]) {
         return credential_provider_imds_1.fromContainerMetadata(init);
     }
     if (process.env[exports.ENV_IMDS_DISABLED]) {
-        return () => Promise.reject(new property_provider_1.CredentialsProviderError("EC2 Instance Metadata Service access disabled"));
+        return async () => {
+            throw new property_provider_1.CredentialsProviderError("EC2 Instance Metadata Service access disabled");
+        };
     }
     return credential_provider_imds_1.fromInstanceMetadata(init);
 };
+exports.remoteProvider = remoteProvider;
+
+
+/***/ }),
+
+/***/ 2650:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.fromProcess = void 0;
+const util_credentials_1 = __nccwpck_require__(8598);
+const resolveProcessCredentials_1 = __nccwpck_require__(4926);
+const fromProcess = (init = {}) => async () => {
+    const profiles = await util_credentials_1.parseKnownFiles(init);
+    return resolveProcessCredentials_1.resolveProcessCredentials(util_credentials_1.getMasterProfileName(init), profiles);
+};
+exports.fromProcess = fromProcess;
+
+
+/***/ }),
+
+/***/ 1104:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getValidatedProcessCredentials = void 0;
+const getValidatedProcessCredentials = (profileName, data) => {
+    if (data.Version !== 1) {
+        throw Error(`Profile ${profileName} credential_process did not return Version 1.`);
+    }
+    if (data.AccessKeyId === undefined || data.SecretAccessKey === undefined) {
+        throw Error(`Profile ${profileName} credential_process returned invalid credentials.`);
+    }
+    if (data.Expiration) {
+        const currentTime = new Date();
+        const expireTime = new Date(data.Expiration);
+        if (expireTime < currentTime) {
+            throw Error(`Profile ${profileName} credential_process returned expired credentials.`);
+        }
+    }
+    return {
+        accessKeyId: data.AccessKeyId,
+        secretAccessKey: data.SecretAccessKey,
+        ...(data.SessionToken && { sessionToken: data.SessionToken }),
+        ...(data.Expiration && { expiration: new Date(data.Expiration) }),
+    };
+};
+exports.getValidatedProcessCredentials = getValidatedProcessCredentials;
 
 
 /***/ }),
@@ -22956,56 +23254,42 @@ const remoteProvider = (init) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fromProcess = exports.ENV_PROFILE = void 0;
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(2650), exports);
+
+
+/***/ }),
+
+/***/ 4926:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveProcessCredentials = void 0;
 const property_provider_1 = __nccwpck_require__(4462);
-const util_credentials_1 = __nccwpck_require__(8598);
 const child_process_1 = __nccwpck_require__(2081);
-exports.ENV_PROFILE = "AWS_PROFILE";
-const fromProcess = (init = {}) => async () => {
-    const profiles = await util_credentials_1.parseKnownFiles(init);
-    return resolveProcessCredentials(util_credentials_1.getMasterProfileName(init), profiles);
-};
-exports.fromProcess = fromProcess;
+const util_1 = __nccwpck_require__(3837);
+const getValidatedProcessCredentials_1 = __nccwpck_require__(1104);
 const resolveProcessCredentials = async (profileName, profiles) => {
     const profile = profiles[profileName];
     if (profiles[profileName]) {
         const credentialProcess = profile["credential_process"];
         if (credentialProcess !== undefined) {
-            return await execPromise(credentialProcess)
-                .then((processResult) => {
+            const execPromise = util_1.promisify(child_process_1.exec);
+            try {
+                const { stdout } = await execPromise(credentialProcess);
                 let data;
                 try {
-                    data = JSON.parse(processResult);
+                    data = JSON.parse(stdout.trim());
                 }
                 catch (_a) {
                     throw Error(`Profile ${profileName} credential_process returned invalid JSON.`);
                 }
-                const { Version: version, AccessKeyId: accessKeyId, SecretAccessKey: secretAccessKey, SessionToken: sessionToken, Expiration: expiration, } = data;
-                if (version !== 1) {
-                    throw Error(`Profile ${profileName} credential_process did not return Version 1.`);
-                }
-                if (accessKeyId === undefined || secretAccessKey === undefined) {
-                    throw Error(`Profile ${profileName} credential_process returned invalid credentials.`);
-                }
-                let expirationUnix;
-                if (expiration) {
-                    const currentTime = new Date();
-                    const expireTime = new Date(expiration);
-                    if (expireTime < currentTime) {
-                        throw Error(`Profile ${profileName} credential_process returned expired credentials.`);
-                    }
-                    expirationUnix = Math.floor(new Date(expiration).valueOf() / 1000);
-                }
-                return {
-                    accessKeyId,
-                    secretAccessKey,
-                    sessionToken,
-                    expirationUnix,
-                };
-            })
-                .catch((error) => {
+                return getValidatedProcessCredentials_1.getValidatedProcessCredentials(profileName, data);
+            }
+            catch (error) {
                 throw new property_provider_1.CredentialsProviderError(error.message);
-            });
+            }
         }
         else {
             throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} did not contain credential_process.`);
@@ -23015,45 +23299,33 @@ const resolveProcessCredentials = async (profileName, profiles) => {
         throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} could not be found in shared credentials file.`);
     }
 };
-const execPromise = (command) => new Promise(function (resolve, reject) {
-    child_process_1.exec(command, (error, stdout) => {
-        if (error) {
-            reject(error);
-            return;
-        }
-        resolve(stdout.trim());
-    });
-});
+exports.resolveProcessCredentials = resolveProcessCredentials;
 
 
 /***/ }),
 
-/***/ 6414:
+/***/ 5184:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isSsoProfile = exports.validateSsoProfile = exports.fromSSO = exports.EXPIRE_WINDOW_MS = void 0;
-const client_sso_1 = __nccwpck_require__(2666);
+exports.fromSSO = void 0;
 const property_provider_1 = __nccwpck_require__(4462);
-const shared_ini_file_loader_1 = __nccwpck_require__(7387);
 const util_credentials_1 = __nccwpck_require__(8598);
-const crypto_1 = __nccwpck_require__(6113);
-const fs_1 = __nccwpck_require__(7147);
-const path_1 = __nccwpck_require__(1017);
-exports.EXPIRE_WINDOW_MS = 15 * 60 * 1000;
-const SHOULD_FAIL_CREDENTIAL_CHAIN = false;
+const isSsoProfile_1 = __nccwpck_require__(2572);
+const resolveSSOCredentials_1 = __nccwpck_require__(4729);
+const validateSsoProfile_1 = __nccwpck_require__(8098);
 const fromSSO = (init = {}) => async () => {
     const { ssoStartUrl, ssoAccountId, ssoRegion, ssoRoleName, ssoClient } = init;
     if (!ssoStartUrl && !ssoAccountId && !ssoRegion && !ssoRoleName) {
         const profiles = await util_credentials_1.parseKnownFiles(init);
         const profileName = util_credentials_1.getMasterProfileName(init);
         const profile = profiles[profileName];
-        if (!exports.isSsoProfile(profile)) {
+        if (!isSsoProfile_1.isSsoProfile(profile)) {
             throw new property_provider_1.CredentialsProviderError(`Profile ${profileName} is not configured with SSO credentials.`);
         }
-        const { sso_start_url, sso_account_id, sso_region, sso_role_name } = exports.validateSsoProfile(profile);
-        return resolveSSOCredentials({
+        const { sso_start_url, sso_account_id, sso_region, sso_role_name } = validateSsoProfile_1.validateSsoProfile(profile);
+        return resolveSSOCredentials_1.resolveSSOCredentials({
             ssoStartUrl: sso_start_url,
             ssoAccountId: sso_account_id,
             ssoRegion: sso_region,
@@ -23066,24 +23338,73 @@ const fromSSO = (init = {}) => async () => {
             ' "ssoAccountId", "ssoRegion", "ssoRoleName"');
     }
     else {
-        return resolveSSOCredentials({ ssoStartUrl, ssoAccountId, ssoRegion, ssoRoleName, ssoClient });
+        return resolveSSOCredentials_1.resolveSSOCredentials({ ssoStartUrl, ssoAccountId, ssoRegion, ssoRoleName, ssoClient });
     }
 };
 exports.fromSSO = fromSSO;
+
+
+/***/ }),
+
+/***/ 6414:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(5184), exports);
+tslib_1.__exportStar(__nccwpck_require__(2572), exports);
+tslib_1.__exportStar(__nccwpck_require__(6623), exports);
+tslib_1.__exportStar(__nccwpck_require__(8098), exports);
+
+
+/***/ }),
+
+/***/ 2572:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.isSsoProfile = void 0;
+const isSsoProfile = (arg) => arg &&
+    (typeof arg.sso_start_url === "string" ||
+        typeof arg.sso_account_id === "string" ||
+        typeof arg.sso_region === "string" ||
+        typeof arg.sso_role_name === "string");
+exports.isSsoProfile = isSsoProfile;
+
+
+/***/ }),
+
+/***/ 4729:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveSSOCredentials = void 0;
+const client_sso_1 = __nccwpck_require__(2666);
+const property_provider_1 = __nccwpck_require__(4462);
+const shared_ini_file_loader_1 = __nccwpck_require__(7387);
+const crypto_1 = __nccwpck_require__(6113);
+const fs_1 = __nccwpck_require__(7147);
+const path_1 = __nccwpck_require__(1017);
+const EXPIRE_WINDOW_MS = 15 * 60 * 1000;
+const SHOULD_FAIL_CREDENTIAL_CHAIN = false;
+const { readFile } = fs_1.promises;
 const resolveSSOCredentials = async ({ ssoStartUrl, ssoAccountId, ssoRegion, ssoRoleName, ssoClient, }) => {
     const hasher = crypto_1.createHash("sha1");
     const cacheName = hasher.update(ssoStartUrl).digest("hex");
     const tokenFile = path_1.join(shared_ini_file_loader_1.getHomeDir(), ".aws", "sso", "cache", `${cacheName}.json`);
     let token;
+    const refreshMessage = `To refresh this SSO session run aws sso login with the corresponding profile.`;
     try {
-        token = JSON.parse(fs_1.readFileSync(tokenFile, { encoding: "utf-8" }));
-        if (new Date(token.expiresAt).getTime() - Date.now() <= exports.EXPIRE_WINDOW_MS) {
-            throw new Error("SSO token is expired.");
-        }
+        token = JSON.parse(await readFile(tokenFile, "utf8"));
     }
     catch (e) {
-        throw new property_provider_1.CredentialsProviderError(`The SSO session associated with this profile has expired or is otherwise invalid. To refresh this SSO session ` +
-            `run aws sso login with the corresponding profile.`, SHOULD_FAIL_CREDENTIAL_CHAIN);
+        throw new property_provider_1.CredentialsProviderError(`The SSO session associated with this profile is invalid. ${refreshMessage}`, SHOULD_FAIL_CREDENTIAL_CHAIN);
+    }
+    if (new Date(token.expiresAt).getTime() - Date.now() <= EXPIRE_WINDOW_MS) {
+        throw new property_provider_1.CredentialsProviderError(`The SSO session associated with this profile has expired. ${refreshMessage}`, SHOULD_FAIL_CREDENTIAL_CHAIN);
     }
     const { accessToken } = token;
     const sso = ssoClient || new client_sso_1.SSOClient({ region: ssoRegion });
@@ -23104,21 +23425,36 @@ const resolveSSOCredentials = async ({ ssoStartUrl, ssoAccountId, ssoRegion, sso
     }
     return { accessKeyId, secretAccessKey, sessionToken, expiration: new Date(expiration) };
 };
+exports.resolveSSOCredentials = resolveSSOCredentials;
+
+
+/***/ }),
+
+/***/ 6623:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
+/***/ 8098:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.validateSsoProfile = void 0;
+const property_provider_1 = __nccwpck_require__(4462);
 const validateSsoProfile = (profile) => {
     const { sso_start_url, sso_account_id, sso_region, sso_role_name } = profile;
     if (!sso_start_url || !sso_account_id || !sso_region || !sso_role_name) {
         throw new property_provider_1.CredentialsProviderError(`Profile is configured with invalid SSO credentials. Required parameters "sso_account_id", "sso_region", ` +
-            `"sso_role_name", "sso_start_url". Got ${Object.keys(profile).join(", ")}\nReference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html`, SHOULD_FAIL_CREDENTIAL_CHAIN);
+            `"sso_role_name", "sso_start_url". Got ${Object.keys(profile).join(", ")}\nReference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html`, false);
     }
     return profile;
 };
 exports.validateSsoProfile = validateSsoProfile;
-const isSsoProfile = (arg) => arg &&
-    (typeof arg.sso_start_url === "string" ||
-        typeof arg.sso_account_id === "string" ||
-        typeof arg.sso_region === "string" ||
-        typeof arg.sso_role_name === "string");
-exports.isSsoProfile = isSsoProfile;
 
 
 /***/ }),
@@ -23930,11 +24266,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deserializerMiddleware = void 0;
 const deserializerMiddleware = (options, deserializer) => (next, context) => async (args) => {
     const { response } = await next(args);
-    const parsed = await deserializer(response, options);
-    return {
-        response,
-        output: parsed,
-    };
+    try {
+        const parsed = await deserializer(response, options);
+        return {
+            response,
+            output: parsed,
+        };
+    }
+    catch (error) {
+        throw Object.assign(error, { $response: response });
+    }
 };
 exports.deserializerMiddleware = deserializerMiddleware;
 
@@ -24135,19 +24476,21 @@ const awsAuthMiddleware = (options) => (next, context) => async function (args) 
             signingService: context["signing_service"],
         }),
     }).catch((error) => {
-        if (error.ServerTime) {
-            options.systemClockOffset = getUpdatedSystemClockOffset_1.getUpdatedSystemClockOffset(error.ServerTime, options.systemClockOffset);
+        var _a;
+        const serverTime = (_a = error.ServerTime) !== null && _a !== void 0 ? _a : getDateHeader(error.$response);
+        if (serverTime) {
+            options.systemClockOffset = getUpdatedSystemClockOffset_1.getUpdatedSystemClockOffset(serverTime, options.systemClockOffset);
         }
         throw error;
     });
-    const { headers } = output.response;
-    const dateHeader = headers && (headers.date || headers.Date);
+    const dateHeader = getDateHeader(output.response);
     if (dateHeader) {
         options.systemClockOffset = getUpdatedSystemClockOffset_1.getUpdatedSystemClockOffset(dateHeader, options.systemClockOffset);
     }
     return output;
 };
 exports.awsAuthMiddleware = awsAuthMiddleware;
+const getDateHeader = (response) => { var _a, _b, _c; return protocol_http_1.HttpResponse.isInstance(response) ? (_b = (_a = response.headers) === null || _a === void 0 ? void 0 : _a.date) !== null && _b !== void 0 ? _b : (_c = response.headers) === null || _c === void 0 ? void 0 : _c.Date : undefined; };
 exports.awsAuthMiddlewareOptions = {
     name: "awsAuthMiddleware",
     tags: ["SIGNATURE", "AWSAUTH"],
@@ -24637,7 +24980,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fromStatic = void 0;
 const property_provider_1 = __nccwpck_require__(4462);
 const isFunction = (func) => typeof func === "function";
-const fromStatic = (defaultValue) => isFunction(defaultValue) ? async () => defaultValue() : property_provider_1.fromStatic(defaultValue);
+const fromStatic = (defaultValue) => isFunction(defaultValue) ? async () => await defaultValue() : property_provider_1.fromStatic(defaultValue);
 exports.fromStatic = fromStatic;
 
 
@@ -24713,21 +25056,41 @@ const set_connection_timeout_1 = __nccwpck_require__(3598);
 const set_socket_timeout_1 = __nccwpck_require__(4751);
 const write_request_body_1 = __nccwpck_require__(5248);
 class NodeHttpHandler {
-    constructor({ connectionTimeout, socketTimeout, httpAgent, httpsAgent } = {}) {
+    constructor(options) {
         this.metadata = { handlerProtocol: "http/1.1" };
-        this.connectionTimeout = connectionTimeout;
-        this.socketTimeout = socketTimeout;
+        if (typeof options === "function") {
+            this.configProvider = async () => {
+                return this.resolveDefaultConfig(await options());
+            };
+        }
+        else {
+            this.config = this.resolveDefaultConfig(options);
+        }
+    }
+    resolveDefaultConfig(options) {
+        const { connectionTimeout, socketTimeout, httpAgent, httpsAgent } = options || {};
         const keepAlive = true;
         const maxSockets = 50;
-        this.httpAgent = httpAgent || new http_1.Agent({ keepAlive, maxSockets });
-        this.httpsAgent = httpsAgent || new https_1.Agent({ keepAlive, maxSockets });
+        return {
+            connectionTimeout,
+            socketTimeout,
+            httpAgent: httpAgent || new http_1.Agent({ keepAlive, maxSockets }),
+            httpsAgent: httpsAgent || new https_1.Agent({ keepAlive, maxSockets }),
+        };
     }
     destroy() {
-        this.httpAgent.destroy();
-        this.httpsAgent.destroy();
+        var _a, _b, _c, _d;
+        (_b = (_a = this.config) === null || _a === void 0 ? void 0 : _a.httpAgent) === null || _b === void 0 ? void 0 : _b.destroy();
+        (_d = (_c = this.config) === null || _c === void 0 ? void 0 : _c.httpsAgent) === null || _d === void 0 ? void 0 : _d.destroy();
     }
-    handle(request, { abortSignal } = {}) {
+    async handle(request, { abortSignal } = {}) {
+        if (!this.config && this.configProvider) {
+            this.config = await this.configProvider();
+        }
         return new Promise((resolve, reject) => {
+            if (!this.config) {
+                throw new Error("Node HTTP request handler config is not resolved");
+            }
             if (abortSignal === null || abortSignal === void 0 ? void 0 : abortSignal.aborted) {
                 const abortError = new Error("Request aborted");
                 abortError.name = "AbortError";
@@ -24742,7 +25105,7 @@ class NodeHttpHandler {
                 method: request.method,
                 path: queryString ? `${request.path}?${queryString}` : request.path,
                 port: request.port,
-                agent: isSSL ? this.httpsAgent : this.httpAgent,
+                agent: isSSL ? this.config.httpsAgent : this.config.httpAgent,
             };
             const requestFunc = isSSL ? https_1.request : http_1.request;
             const req = requestFunc(nodeHttpsOptions, (res) => {
@@ -24761,8 +25124,8 @@ class NodeHttpHandler {
                     reject(err);
                 }
             });
-            set_connection_timeout_1.setConnectionTimeout(req, reject, this.connectionTimeout);
-            set_socket_timeout_1.setSocketTimeout(req, reject, this.socketTimeout);
+            set_connection_timeout_1.setConnectionTimeout(req, reject, this.config.connectionTimeout);
+            set_socket_timeout_1.setSocketTimeout(req, reject, this.config.socketTimeout);
             if (abortSignal) {
                 abortSignal.onabort = () => {
                     req.abort();
@@ -25443,32 +25806,78 @@ exports.isTransientError = isTransientError;
 
 /***/ }),
 
+/***/ 7363:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getHomeDir = void 0;
+const os_1 = __nccwpck_require__(2037);
+const path_1 = __nccwpck_require__(1017);
+const getHomeDir = () => {
+    const { HOME, USERPROFILE, HOMEPATH, HOMEDRIVE = `C:${path_1.sep}` } = process.env;
+    if (HOME)
+        return HOME;
+    if (USERPROFILE)
+        return USERPROFILE;
+    if (HOMEPATH)
+        return `${HOMEDRIVE}${HOMEPATH}`;
+    return os_1.homedir();
+};
+exports.getHomeDir = getHomeDir;
+
+
+/***/ }),
+
 /***/ 7387:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getHomeDir = exports.loadSharedConfigFiles = exports.ENV_CONFIG_PATH = exports.ENV_CREDENTIALS_PATH = void 0;
-const fs_1 = __nccwpck_require__(7147);
-const os_1 = __nccwpck_require__(2037);
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(7363), exports);
+tslib_1.__exportStar(__nccwpck_require__(7871), exports);
+tslib_1.__exportStar(__nccwpck_require__(4105), exports);
+
+
+/***/ }),
+
+/***/ 7871:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.loadSharedConfigFiles = exports.ENV_CONFIG_PATH = exports.ENV_CREDENTIALS_PATH = void 0;
 const path_1 = __nccwpck_require__(1017);
+const getHomeDir_1 = __nccwpck_require__(7363);
+const normalizeConfigFile_1 = __nccwpck_require__(9307);
+const parseIni_1 = __nccwpck_require__(2806);
+const slurpFile_1 = __nccwpck_require__(9242);
 exports.ENV_CREDENTIALS_PATH = "AWS_SHARED_CREDENTIALS_FILE";
 exports.ENV_CONFIG_PATH = "AWS_CONFIG_FILE";
 const swallowError = () => ({});
-const loadSharedConfigFiles = (init = {}) => {
-    const { filepath = process.env[exports.ENV_CREDENTIALS_PATH] || path_1.join(exports.getHomeDir(), ".aws", "credentials"), configFilepath = process.env[exports.ENV_CONFIG_PATH] || path_1.join(exports.getHomeDir(), ".aws", "config"), } = init;
-    return Promise.all([
-        slurpFile(configFilepath).then(parseIni).then(normalizeConfigFile).catch(swallowError),
-        slurpFile(filepath).then(parseIni).catch(swallowError),
-    ]).then((parsedFiles) => {
-        const [configFile, credentialsFile] = parsedFiles;
-        return {
-            configFile,
-            credentialsFile,
-        };
-    });
+const loadSharedConfigFiles = async (init = {}) => {
+    const { filepath = process.env[exports.ENV_CREDENTIALS_PATH] || path_1.join(getHomeDir_1.getHomeDir(), ".aws", "credentials"), configFilepath = process.env[exports.ENV_CONFIG_PATH] || path_1.join(getHomeDir_1.getHomeDir(), ".aws", "config"), } = init;
+    const parsedFiles = await Promise.all([
+        slurpFile_1.slurpFile(configFilepath).then(parseIni_1.parseIni).then(normalizeConfigFile_1.normalizeConfigFile).catch(swallowError),
+        slurpFile_1.slurpFile(filepath).then(parseIni_1.parseIni).catch(swallowError),
+    ]);
+    return {
+        configFile: parsedFiles[0],
+        credentialsFile: parsedFiles[1],
+    };
 };
 exports.loadSharedConfigFiles = loadSharedConfigFiles;
+
+
+/***/ }),
+
+/***/ 9307:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.normalizeConfigFile = void 0;
 const profileKeyRegex = /^profile\s(["'])?([^\1]+)\1$/;
 const normalizeConfigFile = (data) => {
     const map = {};
@@ -25486,6 +25895,17 @@ const normalizeConfigFile = (data) => {
     }
     return map;
 };
+exports.normalizeConfigFile = normalizeConfigFile;
+
+
+/***/ }),
+
+/***/ 2806:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseIni = void 0;
 const profileNameBlockList = ["__proto__", "profile __proto__"];
 const parseIni = (iniData) => {
     const map = {};
@@ -25509,27 +25929,60 @@ const parseIni = (iniData) => {
     }
     return map;
 };
+exports.parseIni = parseIni;
+
+
+/***/ }),
+
+/***/ 9242:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.slurpFile = void 0;
+const fs_1 = __nccwpck_require__(7147);
+const { readFile } = fs_1.promises;
+const fileStatusHash = {};
 const slurpFile = (path) => new Promise((resolve, reject) => {
-    fs_1.readFile(path, "utf8", (err, data) => {
-        if (err) {
-            reject(err);
-        }
-        else {
-            resolve(data);
-        }
-    });
+    if (!fileStatusHash[path]) {
+        fileStatusHash[path] = { isReading: true, contents: "", requestQueue: [] };
+        fileStatusHash[path].requestQueue.push({ resolve, reject });
+        readFile(path, "utf8")
+            .then((data) => {
+            fileStatusHash[path].isReading = false;
+            fileStatusHash[path].contents = data;
+            const { requestQueue } = fileStatusHash[path];
+            while (requestQueue.length) {
+                const { resolve } = requestQueue.pop();
+                resolve(data);
+            }
+        })
+            .catch((err) => {
+            fileStatusHash[path].isReading = false;
+            const { requestQueue } = fileStatusHash[path];
+            while (requestQueue.length) {
+                const { reject } = requestQueue.pop();
+                reject(err);
+            }
+        });
+    }
+    else if (fileStatusHash[path].isReading) {
+        fileStatusHash[path].requestQueue.push({ resolve, reject });
+    }
+    else {
+        resolve(fileStatusHash[path].contents);
+    }
 });
-const getHomeDir = () => {
-    const { HOME, USERPROFILE, HOMEPATH, HOMEDRIVE = `C:${path_1.sep}` } = process.env;
-    if (HOME)
-        return HOME;
-    if (USERPROFILE)
-        return USERPROFILE;
-    if (HOMEPATH)
-        return `${HOMEDRIVE}${HOMEPATH}`;
-    return os_1.homedir();
-};
-exports.getHomeDir = getHomeDir;
+exports.slurpFile = slurpFile;
+
+
+/***/ }),
+
+/***/ 4105:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
@@ -26307,6 +26760,43 @@ const stripLeadingZeroes = (value) => {
 
 /***/ }),
 
+/***/ 3088:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.loadConfigsForDefaultMode = void 0;
+const loadConfigsForDefaultMode = (mode) => {
+    switch (mode) {
+        case "standard":
+            return {
+                retryMode: "standard",
+                connectionTimeout: 3100,
+            };
+        case "in-region":
+            return {
+                retryMode: "standard",
+                connectionTimeout: 1100,
+            };
+        case "cross-region":
+            return {
+                retryMode: "standard",
+                connectionTimeout: 3100,
+            };
+        case "mobile":
+            return {
+                retryMode: "standard",
+                connectionTimeout: 30000,
+            };
+        default:
+            return {};
+    }
+};
+exports.loadConfigsForDefaultMode = loadConfigsForDefaultMode;
+
+
+/***/ }),
+
 /***/ 2363:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -26325,6 +26815,38 @@ const emitWarningIfUnsupportedVersion = (version) => {
     }
 };
 exports.emitWarningIfUnsupportedVersion = emitWarningIfUnsupportedVersion;
+
+
+/***/ }),
+
+/***/ 7778:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.decorateServiceException = exports.ServiceException = void 0;
+class ServiceException extends Error {
+    constructor(options) {
+        super(options.message);
+        Object.setPrototypeOf(this, ServiceException.prototype);
+        this.name = options.name;
+        this.$fault = options.$fault;
+        this.$metadata = options.$metadata;
+    }
+}
+exports.ServiceException = ServiceException;
+const decorateServiceException = (exception, additions = {}) => {
+    Object.entries(additions)
+        .filter(([, v]) => v !== undefined)
+        .forEach(([k, v]) => {
+        exception[k] = v;
+    });
+    const message = exception.message || exception.Message || "UnknownError";
+    exception.message = message;
+    delete exception.Message;
+    return exception;
+};
+exports.decorateServiceException = decorateServiceException;
 
 
 /***/ }),
@@ -26390,7 +26912,9 @@ tslib_1.__exportStar(__nccwpck_require__(6034), exports);
 tslib_1.__exportStar(__nccwpck_require__(4014), exports);
 tslib_1.__exportStar(__nccwpck_require__(8392), exports);
 tslib_1.__exportStar(__nccwpck_require__(4695), exports);
+tslib_1.__exportStar(__nccwpck_require__(3088), exports);
 tslib_1.__exportStar(__nccwpck_require__(2363), exports);
+tslib_1.__exportStar(__nccwpck_require__(7778), exports);
 tslib_1.__exportStar(__nccwpck_require__(1927), exports);
 tslib_1.__exportStar(__nccwpck_require__(6457), exports);
 tslib_1.__exportStar(__nccwpck_require__(5830), exports);
@@ -26886,6 +27410,118 @@ const parseKnownFiles = async (init) => {
 exports.parseKnownFiles = parseKnownFiles;
 const getMasterProfileName = (init) => init.profile || process.env[exports.ENV_PROFILE] || exports.DEFAULT_PROFILE;
 exports.getMasterProfileName = getMasterProfileName;
+
+
+/***/ }),
+
+/***/ 6488:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.IMDS_REGION_PATH = exports.DEFAULTS_MODE_OPTIONS = exports.ENV_IMDS_DISABLED = exports.AWS_DEFAULT_REGION_ENV = exports.AWS_REGION_ENV = exports.AWS_EXECUTION_ENV = void 0;
+exports.AWS_EXECUTION_ENV = "AWS_EXECUTION_ENV";
+exports.AWS_REGION_ENV = "AWS_REGION";
+exports.AWS_DEFAULT_REGION_ENV = "AWS_DEFAULT_REGION";
+exports.ENV_IMDS_DISABLED = "AWS_EC2_METADATA_DISABLED";
+exports.DEFAULTS_MODE_OPTIONS = ["in-region", "cross-region", "mobile", "standard", "legacy"];
+exports.IMDS_REGION_PATH = "/latest/meta-data/placement/region";
+
+
+/***/ }),
+
+/***/ 8450:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.NODE_DEFAULTS_MODE_CONFIG_OPTIONS = void 0;
+const AWS_DEFAULTS_MODE_ENV = "AWS_DEFAULTS_MODE";
+const AWS_DEFAULTS_MODE_CONFIG = "defaults_mode";
+exports.NODE_DEFAULTS_MODE_CONFIG_OPTIONS = {
+    environmentVariableSelector: (env) => {
+        return env[AWS_DEFAULTS_MODE_ENV];
+    },
+    configFileSelector: (profile) => {
+        return profile[AWS_DEFAULTS_MODE_CONFIG];
+    },
+    default: "legacy",
+};
+
+
+/***/ }),
+
+/***/ 4243:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __nccwpck_require__(4351);
+tslib_1.__exportStar(__nccwpck_require__(8238), exports);
+
+
+/***/ }),
+
+/***/ 8238:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.resolveDefaultsModeConfig = void 0;
+const config_resolver_1 = __nccwpck_require__(6153);
+const credential_provider_imds_1 = __nccwpck_require__(5898);
+const node_config_provider_1 = __nccwpck_require__(7684);
+const property_provider_1 = __nccwpck_require__(4462);
+const constants_1 = __nccwpck_require__(6488);
+const defaultsModeConfig_1 = __nccwpck_require__(8450);
+const resolveDefaultsModeConfig = ({ region = node_config_provider_1.loadConfig(config_resolver_1.NODE_REGION_CONFIG_OPTIONS), defaultsMode = node_config_provider_1.loadConfig(defaultsModeConfig_1.NODE_DEFAULTS_MODE_CONFIG_OPTIONS), } = {}) => property_provider_1.memoize(async () => {
+    const mode = typeof defaultsMode === "function" ? await defaultsMode() : defaultsMode;
+    switch (mode === null || mode === void 0 ? void 0 : mode.toLowerCase()) {
+        case "auto":
+            return resolveNodeDefaultsModeAuto(region);
+        case "in-region":
+        case "cross-region":
+        case "mobile":
+        case "standard":
+        case "legacy":
+            return Promise.resolve(mode === null || mode === void 0 ? void 0 : mode.toLocaleLowerCase());
+        case undefined:
+            return Promise.resolve("legacy");
+        default:
+            throw new Error(`Invalid parameter for "defaultsMode", expect ${constants_1.DEFAULTS_MODE_OPTIONS.join(", ")}, got ${mode}`);
+    }
+});
+exports.resolveDefaultsModeConfig = resolveDefaultsModeConfig;
+const resolveNodeDefaultsModeAuto = async (clientRegion) => {
+    if (clientRegion) {
+        const resolvedRegion = typeof clientRegion === "function" ? await clientRegion() : clientRegion;
+        const inferredRegion = await inferPhysicalRegion();
+        if (!inferredRegion) {
+            return "standard";
+        }
+        if (resolvedRegion === inferredRegion) {
+            return "in-region";
+        }
+        else {
+            return "cross-region";
+        }
+    }
+    return "standard";
+};
+const inferPhysicalRegion = async () => {
+    var _a;
+    if (process.env[constants_1.AWS_EXECUTION_ENV] && (process.env[constants_1.AWS_REGION_ENV] || process.env[constants_1.AWS_DEFAULT_REGION_ENV])) {
+        return (_a = process.env[constants_1.AWS_REGION_ENV]) !== null && _a !== void 0 ? _a : process.env[constants_1.AWS_DEFAULT_REGION_ENV];
+    }
+    if (!process.env[constants_1.ENV_IMDS_DISABLED]) {
+        try {
+            const endpoint = await credential_provider_imds_1.getInstanceMetadataEndpoint();
+            return (await credential_provider_imds_1.httpRequest({ ...endpoint, path: constants_1.IMDS_REGION_PATH })).toString();
+        }
+        catch (e) {
+        }
+    }
+};
 
 
 /***/ }),
@@ -36928,21 +37564,21 @@ module.exports = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("zlib");
 /***/ 3713:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"@aws-sdk/client-cloudformation","description":"AWS SDK for JavaScript Cloudformation Client for Node.js, Browser and React Native","version":"3.43.0","scripts":{"build":"yarn build:cjs && yarn build:es && yarn build:types","build:cjs":"tsc -p tsconfig.json","build:docs":"yarn clean:docs && typedoc ./","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","clean":"yarn clean:dist && yarn clean:docs","clean:dist":"rimraf ./dist","clean:docs":"rimraf ./docs","downlevel-dts":"downlevel-dts dist-types dist-types/ts3.4","test":"exit 0"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/client-sts":"3.43.0","@aws-sdk/config-resolver":"3.40.0","@aws-sdk/credential-provider-node":"3.41.0","@aws-sdk/fetch-http-handler":"3.40.0","@aws-sdk/hash-node":"3.40.0","@aws-sdk/invalid-dependency":"3.40.0","@aws-sdk/middleware-content-length":"3.40.0","@aws-sdk/middleware-host-header":"3.40.0","@aws-sdk/middleware-logger":"3.40.0","@aws-sdk/middleware-retry":"3.40.0","@aws-sdk/middleware-serde":"3.40.0","@aws-sdk/middleware-signing":"3.40.0","@aws-sdk/middleware-stack":"3.40.0","@aws-sdk/middleware-user-agent":"3.40.0","@aws-sdk/node-config-provider":"3.40.0","@aws-sdk/node-http-handler":"3.40.0","@aws-sdk/protocol-http":"3.40.0","@aws-sdk/smithy-client":"3.41.0","@aws-sdk/types":"3.40.0","@aws-sdk/url-parser":"3.40.0","@aws-sdk/util-base64-browser":"3.37.0","@aws-sdk/util-base64-node":"3.37.0","@aws-sdk/util-body-length-browser":"3.37.0","@aws-sdk/util-body-length-node":"3.37.0","@aws-sdk/util-user-agent-browser":"3.40.0","@aws-sdk/util-user-agent-node":"3.40.0","@aws-sdk/util-utf8-browser":"3.37.0","@aws-sdk/util-utf8-node":"3.37.0","@aws-sdk/util-waiter":"3.40.0","entities":"2.2.0","fast-xml-parser":"3.19.0","tslib":"^2.3.0","uuid":"^8.3.2"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.38.0","@types/node":"^12.7.5","@types/uuid":"^8.3.0","downlevel-dts":"0.7.0","jest":"^26.1.0","rimraf":"^3.0.0","ts-jest":"^26.4.1","typedoc":"^0.19.2","typescript":"~4.3.5"},"engines":{"node":">=10.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-cloudformation","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-cloudformation"}}');
+module.exports = JSON.parse('{"name":"@aws-sdk/client-cloudformation","description":"AWS SDK for JavaScript Cloudformation Client for Node.js, Browser and React Native","version":"3.52.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/client-sts":"3.52.0","@aws-sdk/config-resolver":"3.52.0","@aws-sdk/credential-provider-node":"3.52.0","@aws-sdk/fetch-http-handler":"3.52.0","@aws-sdk/hash-node":"3.52.0","@aws-sdk/invalid-dependency":"3.52.0","@aws-sdk/middleware-content-length":"3.52.0","@aws-sdk/middleware-host-header":"3.52.0","@aws-sdk/middleware-logger":"3.52.0","@aws-sdk/middleware-retry":"3.52.0","@aws-sdk/middleware-serde":"3.52.0","@aws-sdk/middleware-signing":"3.52.0","@aws-sdk/middleware-stack":"3.52.0","@aws-sdk/middleware-user-agent":"3.52.0","@aws-sdk/node-config-provider":"3.52.0","@aws-sdk/node-http-handler":"3.52.0","@aws-sdk/protocol-http":"3.52.0","@aws-sdk/smithy-client":"3.52.0","@aws-sdk/types":"3.52.0","@aws-sdk/url-parser":"3.52.0","@aws-sdk/util-base64-browser":"3.52.0","@aws-sdk/util-base64-node":"3.52.0","@aws-sdk/util-body-length-browser":"3.52.0","@aws-sdk/util-body-length-node":"3.52.0","@aws-sdk/util-defaults-mode-browser":"3.52.0","@aws-sdk/util-defaults-mode-node":"3.52.0","@aws-sdk/util-user-agent-browser":"3.52.0","@aws-sdk/util-user-agent-node":"3.52.0","@aws-sdk/util-utf8-browser":"3.52.0","@aws-sdk/util-utf8-node":"3.52.0","@aws-sdk/util-waiter":"3.52.0","entities":"2.2.0","fast-xml-parser":"3.19.0","tslib":"^2.3.0","uuid":"^8.3.2"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.52.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","@types/uuid":"^8.3.0","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.3.5"},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-cloudformation","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-cloudformation"}}');
 
 /***/ }),
 
 /***/ 1092:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"@aws-sdk/client-sso","description":"AWS SDK for JavaScript Sso Client for Node.js, Browser and React Native","version":"3.41.0","scripts":{"build":"yarn build:cjs && yarn build:es && yarn build:types","build:cjs":"tsc -p tsconfig.json","build:docs":"yarn clean:docs && typedoc ./","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","clean":"yarn clean:dist && yarn clean:docs","clean:dist":"rimraf ./dist","clean:docs":"rimraf ./docs","downlevel-dts":"downlevel-dts dist-types dist-types/ts3.4","test":"exit 0"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.40.0","@aws-sdk/fetch-http-handler":"3.40.0","@aws-sdk/hash-node":"3.40.0","@aws-sdk/invalid-dependency":"3.40.0","@aws-sdk/middleware-content-length":"3.40.0","@aws-sdk/middleware-host-header":"3.40.0","@aws-sdk/middleware-logger":"3.40.0","@aws-sdk/middleware-retry":"3.40.0","@aws-sdk/middleware-serde":"3.40.0","@aws-sdk/middleware-stack":"3.40.0","@aws-sdk/middleware-user-agent":"3.40.0","@aws-sdk/node-config-provider":"3.40.0","@aws-sdk/node-http-handler":"3.40.0","@aws-sdk/protocol-http":"3.40.0","@aws-sdk/smithy-client":"3.41.0","@aws-sdk/types":"3.40.0","@aws-sdk/url-parser":"3.40.0","@aws-sdk/util-base64-browser":"3.37.0","@aws-sdk/util-base64-node":"3.37.0","@aws-sdk/util-body-length-browser":"3.37.0","@aws-sdk/util-body-length-node":"3.37.0","@aws-sdk/util-user-agent-browser":"3.40.0","@aws-sdk/util-user-agent-node":"3.40.0","@aws-sdk/util-utf8-browser":"3.37.0","@aws-sdk/util-utf8-node":"3.37.0","tslib":"^2.3.0"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.38.0","@types/node":"^12.7.5","downlevel-dts":"0.7.0","jest":"^26.1.0","rimraf":"^3.0.0","ts-jest":"^26.4.1","typedoc":"^0.19.2","typescript":"~4.3.5"},"engines":{"node":">=10.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sso","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sso"}}');
+module.exports = JSON.parse('{"name":"@aws-sdk/client-sso","description":"AWS SDK for JavaScript Sso Client for Node.js, Browser and React Native","version":"3.52.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.52.0","@aws-sdk/fetch-http-handler":"3.52.0","@aws-sdk/hash-node":"3.52.0","@aws-sdk/invalid-dependency":"3.52.0","@aws-sdk/middleware-content-length":"3.52.0","@aws-sdk/middleware-host-header":"3.52.0","@aws-sdk/middleware-logger":"3.52.0","@aws-sdk/middleware-retry":"3.52.0","@aws-sdk/middleware-serde":"3.52.0","@aws-sdk/middleware-stack":"3.52.0","@aws-sdk/middleware-user-agent":"3.52.0","@aws-sdk/node-config-provider":"3.52.0","@aws-sdk/node-http-handler":"3.52.0","@aws-sdk/protocol-http":"3.52.0","@aws-sdk/smithy-client":"3.52.0","@aws-sdk/types":"3.52.0","@aws-sdk/url-parser":"3.52.0","@aws-sdk/util-base64-browser":"3.52.0","@aws-sdk/util-base64-node":"3.52.0","@aws-sdk/util-body-length-browser":"3.52.0","@aws-sdk/util-body-length-node":"3.52.0","@aws-sdk/util-defaults-mode-browser":"3.52.0","@aws-sdk/util-defaults-mode-node":"3.52.0","@aws-sdk/util-user-agent-browser":"3.52.0","@aws-sdk/util-user-agent-node":"3.52.0","@aws-sdk/util-utf8-browser":"3.52.0","@aws-sdk/util-utf8-node":"3.52.0","tslib":"^2.3.0"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.52.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.3.5"},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sso","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sso"}}');
 
 /***/ }),
 
 /***/ 7947:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"@aws-sdk/client-sts","description":"AWS SDK for JavaScript Sts Client for Node.js, Browser and React Native","version":"3.43.0","scripts":{"build":"yarn build:cjs && yarn build:es && yarn build:types","build:cjs":"tsc -p tsconfig.json","build:docs":"yarn clean:docs && typedoc ./","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","clean":"yarn clean:dist && yarn clean:docs","clean:dist":"rimraf ./dist","clean:docs":"rimraf ./docs","downlevel-dts":"downlevel-dts dist-types dist-types/ts3.4","test":"exit 0"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.40.0","@aws-sdk/credential-provider-node":"3.41.0","@aws-sdk/fetch-http-handler":"3.40.0","@aws-sdk/hash-node":"3.40.0","@aws-sdk/invalid-dependency":"3.40.0","@aws-sdk/middleware-content-length":"3.40.0","@aws-sdk/middleware-host-header":"3.40.0","@aws-sdk/middleware-logger":"3.40.0","@aws-sdk/middleware-retry":"3.40.0","@aws-sdk/middleware-sdk-sts":"3.40.0","@aws-sdk/middleware-serde":"3.40.0","@aws-sdk/middleware-signing":"3.40.0","@aws-sdk/middleware-stack":"3.40.0","@aws-sdk/middleware-user-agent":"3.40.0","@aws-sdk/node-config-provider":"3.40.0","@aws-sdk/node-http-handler":"3.40.0","@aws-sdk/protocol-http":"3.40.0","@aws-sdk/smithy-client":"3.41.0","@aws-sdk/types":"3.40.0","@aws-sdk/url-parser":"3.40.0","@aws-sdk/util-base64-browser":"3.37.0","@aws-sdk/util-base64-node":"3.37.0","@aws-sdk/util-body-length-browser":"3.37.0","@aws-sdk/util-body-length-node":"3.37.0","@aws-sdk/util-user-agent-browser":"3.40.0","@aws-sdk/util-user-agent-node":"3.40.0","@aws-sdk/util-utf8-browser":"3.37.0","@aws-sdk/util-utf8-node":"3.37.0","entities":"2.2.0","fast-xml-parser":"3.19.0","tslib":"^2.3.0"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.38.0","@types/node":"^12.7.5","downlevel-dts":"0.7.0","jest":"^26.1.0","rimraf":"^3.0.0","ts-jest":"^26.4.1","typedoc":"^0.19.2","typescript":"~4.3.5"},"engines":{"node":">=10.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sts","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sts"}}');
+module.exports = JSON.parse('{"name":"@aws-sdk/client-sts","description":"AWS SDK for JavaScript Sts Client for Node.js, Browser and React Native","version":"3.52.0","scripts":{"build":"concurrently \'yarn:build:cjs\' \'yarn:build:es\' \'yarn:build:types\'","build:cjs":"tsc -p tsconfig.cjs.json","build:docs":"typedoc","build:es":"tsc -p tsconfig.es.json","build:types":"tsc -p tsconfig.types.json","build:types:downlevel":"downlevel-dts dist-types dist-types/ts3.4","clean":"rimraf ./dist-* && rimraf *.tsbuildinfo"},"main":"./dist-cjs/index.js","types":"./dist-types/index.d.ts","module":"./dist-es/index.js","sideEffects":false,"dependencies":{"@aws-crypto/sha256-browser":"2.0.0","@aws-crypto/sha256-js":"2.0.0","@aws-sdk/config-resolver":"3.52.0","@aws-sdk/credential-provider-node":"3.52.0","@aws-sdk/fetch-http-handler":"3.52.0","@aws-sdk/hash-node":"3.52.0","@aws-sdk/invalid-dependency":"3.52.0","@aws-sdk/middleware-content-length":"3.52.0","@aws-sdk/middleware-host-header":"3.52.0","@aws-sdk/middleware-logger":"3.52.0","@aws-sdk/middleware-retry":"3.52.0","@aws-sdk/middleware-sdk-sts":"3.52.0","@aws-sdk/middleware-serde":"3.52.0","@aws-sdk/middleware-signing":"3.52.0","@aws-sdk/middleware-stack":"3.52.0","@aws-sdk/middleware-user-agent":"3.52.0","@aws-sdk/node-config-provider":"3.52.0","@aws-sdk/node-http-handler":"3.52.0","@aws-sdk/protocol-http":"3.52.0","@aws-sdk/smithy-client":"3.52.0","@aws-sdk/types":"3.52.0","@aws-sdk/url-parser":"3.52.0","@aws-sdk/util-base64-browser":"3.52.0","@aws-sdk/util-base64-node":"3.52.0","@aws-sdk/util-body-length-browser":"3.52.0","@aws-sdk/util-body-length-node":"3.52.0","@aws-sdk/util-defaults-mode-browser":"3.52.0","@aws-sdk/util-defaults-mode-node":"3.52.0","@aws-sdk/util-user-agent-browser":"3.52.0","@aws-sdk/util-user-agent-node":"3.52.0","@aws-sdk/util-utf8-browser":"3.52.0","@aws-sdk/util-utf8-node":"3.52.0","entities":"2.2.0","fast-xml-parser":"3.19.0","tslib":"^2.3.0"},"devDependencies":{"@aws-sdk/service-client-documentation-generator":"3.52.0","@tsconfig/recommended":"1.0.1","@types/node":"^12.7.5","concurrently":"7.0.0","downlevel-dts":"0.7.0","rimraf":"3.0.2","typedoc":"0.19.2","typescript":"~4.3.5"},"engines":{"node":">=12.0.0"},"typesVersions":{"<4.0":{"dist-types/*":["dist-types/ts3.4/*"]}},"files":["dist-*"],"author":{"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/javascript/"},"license":"Apache-2.0","browser":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.browser"},"react-native":{"./dist-es/runtimeConfig":"./dist-es/runtimeConfig.native"},"homepage":"https://github.com/aws/aws-sdk-js-v3/tree/main/clients/client-sts","repository":{"type":"git","url":"https://github.com/aws/aws-sdk-js-v3.git","directory":"clients/client-sts"}}');
 
 /***/ }),
 
