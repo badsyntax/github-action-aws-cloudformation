@@ -125,7 +125,6 @@ jobs:
       - name: Update CloudFormation Stack
         id: update-stack
         uses: badsyntax/github-action-aws-cloudformation@master
-        if:
         with:
           stack-name: 'example-cloudformation-stack'
           template: './cloudformation/s3bucket-example.yml'
