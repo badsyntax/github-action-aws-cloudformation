@@ -21,6 +21,11 @@ export function getInputs() {
     trimWhitespace: true,
   });
 
+  const capabilities = getInput('capabilities', {
+    required: false,
+    trimWhitespace: true,
+  });
+
   const applyChangeSet =
     getInput('apply-change-set', {
       required: true,
@@ -33,5 +38,6 @@ export function getInputs() {
     template,
     applyChangeSet,
     parameters,
+    capabilities,
   };
 }

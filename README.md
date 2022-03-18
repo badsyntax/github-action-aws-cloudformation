@@ -16,6 +16,7 @@ This Action is actively maintained and includes additional features.
 - Apply or Preview ChangeSet with Pull Request comments
 - Log intervals to show constant feedback
 - CloudFormation outputs set as Action Outputs (which can be used in subsequent steps)
+- Template validation
 
 ## Getting Started
 
@@ -73,13 +74,14 @@ jobs:
 
 ## Action Inputs
 
-| key                     | description                                                                                         | example                                         |
-| ----------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `stack-name`            | The name of the Cloudformation stack to be created                                                  | `example-com-static-cloudformation-stack`       |
-| `template`              | The relative path to the CloudFormation stack template                                              | `./cloudformation/s3bucket_with_cloudfront.yml` |
-| `aws-region`            | The AWS region in which to create the stack                                                         | `us-east-1`                                     |
-| `parameters` (optional) | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped | `Param1=foo&Param2=http://example.com`          |
-| `apply-change-set`      | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                               | `true`                                          |
+| key                       | description                                                                                                                                                                                                                                         | example                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `stack-name`              | The name of the Cloudformation stack to be created                                                                                                                                                                                                  | `example-com-static-cloudformation-stack`       |
+| `template`                | The relative path to the CloudFormation stack template                                                                                                                                                                                              | `./cloudformation/s3bucket_with_cloudfront.yml` |
+| `aws-region`              | The AWS region in which to create the stack                                                                                                                                                                                                         | `us-east-1`                                     |
+| `parameters` (optional)   | The parameters to override in the stack inputs, in query string format. Whitespace will be stripped                                                                                                                                                 | `Param1=foo&Param2=http://example.com`          |
+| `apply-change-set`        | Whether to apply the ChangeSet, or provide a summary of the ChangeSet                                                                                                                                                                               | `true`                                          |
+| `capabilities` (optional) | A comma-delimited list of stack template [capabilities](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-cloudformation/interfaces/createchangesetcommandinput.html#capabilities) to acknowledge. Defaults to `CAPABILITY_IAM` | `CAPABILITY_IAM`                                |
 
 ## Action Outputs
 

@@ -41,6 +41,7 @@ export async function run(): Promise<void> {
       cloudFormationClient,
       inputs.stackName,
       inputs.applyChangeSet,
+      inputs.capabilities,
       cfTemplateBody,
       cfParameters
     );

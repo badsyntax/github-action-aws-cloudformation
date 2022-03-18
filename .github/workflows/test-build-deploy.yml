@@ -66,6 +66,7 @@ jobs:
           apply-change-set: ${{ github.event_name != 'repository_dispatch' }}
           aws-region: 'us-east-1'
           parameters: 'S3BucketName=badsyntax-github-action-example-aws-cloudformation-us-east-1&S3AllowedOrigins=https://richardwillis.info'
+          capabilities: 'CAPABILITY_NAMED_IAM, CAPABILITY_IAM'
 
       - uses: badsyntax/github-action-issue-comment@v1.0.0
         name: Comment on Pull Request
