@@ -20,7 +20,7 @@ This Action is actively maintained and includes additional features.
 
 ## Getting Started
 
-Please read <https://github.com/aws-actions/aws-cloudformation-github-deploy#credentials-and-region>
+Please read <https://github.com/aws-actions/configure-aws-credentials#credentials>
 
 ```yaml
 name: 'deploy'
