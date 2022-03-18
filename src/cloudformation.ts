@@ -1,4 +1,4 @@
-import { debug, info, notice, warning } from '@actions/core';
+import { debug, error, info, notice, warning } from '@actions/core';
 import {
   Parameter,
   CloudFormationClient,
@@ -195,7 +195,8 @@ async function createChangeSet(
   cfStackName: string,
   changeSetType: ChangeSetType,
   cfTemplateBody: string,
-  parameters: Parameter[]
+  parameters: Parameter[],
+  capabilities: string
 ) {
   return client.send(
     new CreateChangeSetCommand({
@@ -204,7 +205,9 @@ async function createChangeSet(
       ChangeSetName: `test-changeset-${Date.now()}`,
       ChangeSetType: changeSetType,
       Parameters: parameters,
-      Capabilities: [Capability.CAPABILITY_IAM],
+      Capabilities: capabilities
+        .split(',')
+        .map((capability) => capability.trim()),
     })
   );
 }
@@ -346,10 +349,12 @@ export async function updateCloudFormationStack(
   client: CloudFormationClient,
   cfStackName: string,
   applyChangeSet: boolean,
+  capabilities: string,
   cfTemplateBody: string,
   cfParameters: Parameter[]
 ): Promise<UpdateCloudFormationStackResponse> {
   await validateTemplate(client, cfTemplateBody);
+
   const changeSetType = await getChangeSetType(
     client,
     cfStackName,
@@ -361,7 +366,8 @@ export async function updateCloudFormationStack(
     cfStackName,
     changeSetType,
     cfTemplateBody,
-    cfParameters
+    cfParameters,
+    capabilities
   );
 
   const changes = await getChanges(client, cfStackName, changeSet);

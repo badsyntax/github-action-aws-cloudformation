@@ -37838,14 +37838,16 @@ function shouldDeleteExistingStack(stack) {
     return (stack.StackStatus === dist_cjs.StackStatus.ROLLBACK_COMPLETE ||
         stack.StackStatus === dist_cjs.StackStatus.REVIEW_IN_PROGRESS);
 }
-async function createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, parameters) {
+async function createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, parameters, capabilities) {
     return client.send(new dist_cjs.CreateChangeSetCommand({
         TemplateBody: cfTemplateBody,
         StackName: cfStackName,
         ChangeSetName: `test-changeset-${Date.now()}`,
         ChangeSetType: changeSetType,
         Parameters: parameters,
-        Capabilities: [dist_cjs.Capability.CAPABILITY_IAM],
+        Capabilities: capabilities
+            .split(',')
+            .map((capability) => capability.trim()),
     }));
 }
 async function deleteChangeSet(client, cfStackName, changeSetId) {
@@ -37924,10 +37926,10 @@ function getCloudFormationParameters(parametersQuery) {
     }
     return cfParams;
 }
-async function updateCloudFormationStack(client, cfStackName, applyChangeSet, cfTemplateBody, cfParameters) {
+async function updateCloudFormationStack(client, cfStackName, applyChangeSet, capabilities, cfTemplateBody, cfParameters) {
     await validateTemplate(client, cfTemplateBody);
     const changeSetType = await getChangeSetType(client, cfStackName, cfParameters);
-    const changeSet = await createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, cfParameters);
+    const changeSet = await createChangeSet(client, cfStackName, changeSetType, cfTemplateBody, cfParameters, capabilities);
     const changes = await getChanges(client, cfStackName, changeSet);
     let stack = undefined;
     if (changeSet.Id) {
@@ -38004,6 +38006,10 @@ function getInputs() {
         required: false,
         trimWhitespace: true,
     });
+    const capabilities = (0,core.getInput)('capabilities', {
+        required: false,
+        trimWhitespace: true,
+    });
     const applyChangeSet = (0,core.getInput)('apply-change-set', {
         required: true,
         trimWhitespace: true,
@@ -38014,6 +38020,7 @@ function getInputs() {
         template,
         applyChangeSet,
         parameters,
+        capabilities,
     };
 }
 
@@ -38037,7 +38044,7 @@ async function run() {
         });
         const cfParameters = getCloudFormationParameters(inputs.parameters);
         (0,core.debug)(`CloudFormation Parameters:\n${JSON.stringify(cfParameters, null, 2)}`);
-        const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.applyChangeSet, cfTemplateBody, cfParameters);
+        const result = await updateCloudFormationStack(cloudFormationClient, inputs.stackName, inputs.applyChangeSet, inputs.capabilities, cfTemplateBody, cfParameters);
         logOutputParameters(((_a = result.stack) === null || _a === void 0 ? void 0 : _a.Outputs) || []);
         logChanges(result.changes);
     }

@@ -20,6 +20,10 @@ inputs:
   apply-change-set:
     required: false
     description: 'Whether to show the ChangeSet as a Pull Request comment'
+  capabilities:
+    description: "A comma-delimited list of stack template capabilities to acknowledge. Defaults to 'CAPABILITY_IAM'"
+    required: false
+    default: 'CAPABILITY_IAM'
 outputs:
   outputs:
     description: 'JSON string array of CloudFormation outputs'
